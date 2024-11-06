@@ -2,6 +2,7 @@ import org.gradle.kotlin.dsl.android
 
 plugins {
     id("ackee.security.android.library")
+    id("ackee.security.publishing")
     id("ackee.security.testing")
     id("ackee.security.testing.android")
 }

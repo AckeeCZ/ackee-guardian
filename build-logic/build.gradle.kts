@@ -6,6 +6,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.detekt.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.mavenPublish.gradlePlugin)
 }
 
 gradlePlugin {
@@ -21,6 +22,11 @@ gradlePlugin {
         register("android-library") {
             id = "$basePluginId.android.library"
             implementationClass = "$pluginPackage.AndroidLibraryPlugin"
+        }
+
+        register("publishing") {
+            id = "$basePluginId.publishing"
+            implementationClass = "$pluginPackage.PublishingPlugin"
         }
 
         register("testing") {

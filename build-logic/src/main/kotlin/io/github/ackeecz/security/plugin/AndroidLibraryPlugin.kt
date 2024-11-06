@@ -24,6 +24,12 @@ internal class AndroidLibraryPlugin : Plugin<Project> {
             defaultConfig {
                 consumerProguardFiles("consumer-rules.pro")
             }
+
+            buildTypes {
+                getByName("release") {
+                    isMinifyEnabled = false
+                }
+            }
         }
     }
 }

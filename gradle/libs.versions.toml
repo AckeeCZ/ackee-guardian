@@ -4,11 +4,13 @@ androidx-test-junitKtx = "1.2.1"
 agp = "8.7.2"
 bouncyCastle = "1.78.1"
 detekt = "1.23.7"
+dokka = "1.9.20"
 junit4 = "4.13.2"
 junit5-bom = "5.11.0"
 kotlin = "2.0.21"
 kotlin-coroutinesBom = "1.9.0"
 kotest = "5.9.1"
+mavenPublish = "0.30.0"
 robolectric = "4.13"
 
 [libraries]
@@ -37,9 +39,12 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 detekt-gradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+mavenPublish-gradlePlugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
