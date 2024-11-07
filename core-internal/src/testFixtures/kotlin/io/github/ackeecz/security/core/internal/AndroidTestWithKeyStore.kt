@@ -1,8 +1,8 @@
-package io.github.ackeecz.security.core
+package io.github.ackeecz.security.core.internal
 
 import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.github.ackeecz.security.core.junit.rule.AndroidFakeKeyStoreRule
+import io.github.ackeecz.security.core.internal.junit.rule.AndroidFakeKeyStoreRule
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config

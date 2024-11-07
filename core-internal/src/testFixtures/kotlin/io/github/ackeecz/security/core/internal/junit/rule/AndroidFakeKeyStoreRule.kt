@@ -1,4 +1,4 @@
-package io.github.ackeecz.security.core.junit.rule
+package io.github.ackeecz.security.core.internal.junit.rule
 
 import android.security.keystore.KeyGenParameterSpec
 import org.bouncycastle.asn1.x500.X500Name

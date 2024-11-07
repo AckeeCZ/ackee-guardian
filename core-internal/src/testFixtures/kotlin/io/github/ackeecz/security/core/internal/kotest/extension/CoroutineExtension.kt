@@ -1,4 +1,4 @@
-package io.github.ackeecz.security.core.kotest.extension
+package io.github.ackeecz.security.core.internal.kotest.extension
 
 import io.kotest.core.listeners.AfterEachListener
 import io.kotest.core.listeners.BeforeEachListener

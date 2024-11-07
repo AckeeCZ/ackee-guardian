@@ -1,6 +1,6 @@
-package io.github.ackeecz.security.core.junit.rule
+package io.github.ackeecz.security.core.internal.junit.rule
 
-import io.github.ackeecz.security.core.kotest.extension.CoroutineExtension
+import io.github.ackeecz.security.core.internal.kotest.extension.CoroutineExtension
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import org.junit.rules.TestWatcher

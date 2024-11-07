@@ -1,5 +1,8 @@
+# TODO Update deps
 [versions]
 androidx-annotation = "1.9.1"
+androidx-collectionKtx = "1.4.5"
+androidx-coreKtx = "1.15.0"
 androidx-test-junitKtx = "1.2.1"
 agp = "8.7.2"
 bouncyCastle = "1.78.1"
@@ -12,9 +15,12 @@ kotlin-coroutinesBom = "1.9.0"
 kotest = "5.9.1"
 mavenPublish = "0.30.0"
 robolectric = "4.13"
+tink = "1.8.0"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+androidx-collectionKtx = { module = "androidx.collection:collection-ktx", version.ref = "androidx-collectionKtx" }
+androidx-coreKtx = { module = "androidx.core:core-ktx", version.ref = "androidx-coreKtx" }
 androidx-test-junitKtx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-junitKtx" }
 
 bouncyCastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk15to18", version.ref = "bouncyCastle" }
@@ -34,6 +40,8 @@ kotest-framework-api = { module = "io.kotest:kotest-framework-api", version.ref 
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+
+tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 
 # Build-logic dependencies
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
