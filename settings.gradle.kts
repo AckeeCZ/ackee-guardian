@@ -30,4 +30,8 @@ rootProject.name = "ackee-security"
 include(":app")
 include(":core")
 include(":core-internal")
+include(":datastore")
+include(":datastore-core")
+include(":datastore-core-internal")
+include(":datastore-preferences")
 include(":jetpack")

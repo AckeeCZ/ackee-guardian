@@ -20,7 +20,7 @@ internal class AndroidLibraryPlugin : Plugin<Project> {
         pluginManager.apply(libs.findPlugin("android.library"))
         pluginManager.apply(libs.findPlugin("kotlin.android"))
 
-        androidBase {
+        androidLibrary {
             defaultConfig {
                 consumerProguardFiles("consumer-rules.pro")
             }

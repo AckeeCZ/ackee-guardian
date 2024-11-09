@@ -3,6 +3,7 @@
 androidx-annotation = "1.9.1"
 androidx-collectionKtx = "1.4.5"
 androidx-coreKtx = "1.15.0"
+androidx-datastore = "1.1.1"
 androidx-test-junitKtx = "1.2.1"
 agp = "8.7.2"
 bouncyCastle = "1.78.1"
@@ -14,6 +15,8 @@ kotlin = "2.0.21"
 kotlin-coroutinesBom = "1.9.0"
 kotest = "5.9.1"
 mavenPublish = "0.30.0"
+protobuf = "4.26.1"
+protobuf-gradlePlugin = "0.9.4"
 robolectric = "4.13"
 tink = "1.8.0"
 
@@ -21,6 +24,8 @@ tink = "1.8.0"
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-collectionKtx = { module = "androidx.collection:collection-ktx", version.ref = "androidx-collectionKtx" }
 androidx-coreKtx = { module = "androidx.core:core-ktx", version.ref = "androidx-coreKtx" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-test-junitKtx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-junitKtx" }
 
 bouncyCastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk15to18", version.ref = "bouncyCastle" }
@@ -39,6 +44,9 @@ kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.
 kotest-framework-api = { module = "io.kotest:kotest-framework-api", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 
+protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
@@ -56,3 +64,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }

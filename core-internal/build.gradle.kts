@@ -1,17 +1,11 @@
 plugins {
     id("ackee.security.android.library")
     id("ackee.security.publishing")
+    id("ackee.security.testfixtures")
 }
 
 android {
     namespace = "io.github.ackeecz.security.core.internal"
-
-    // TODO test fixtures source code ignores Kotlin compiler options declared in KotlinPlugin
-    //  convention plugin for some reason. Try to figure out why.
-    @Suppress("UnstableApiUsage")
-    testFixtures {
-        enable = true
-    }
 }
 
 dependencies {

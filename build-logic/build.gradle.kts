@@ -29,6 +29,11 @@ gradlePlugin {
             implementationClass = "$pluginPackage.PublishingPlugin"
         }
 
+        register("test-fixtures") {
+            id = "$basePluginId.testfixtures"
+            implementationClass = "$pluginPackage.TestFixturesPlugin"
+        }
+
         register("testing") {
             id = "$basePluginId.testing"
             implementationClass = "$pluginPackage.TestingPlugin"
