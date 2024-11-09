@@ -1,5 +1,6 @@
 package io.github.ackeecz.security.properties
 
+import io.github.ackeecz.security.ProjectNames
 import java.util.Properties
 
 sealed class ArtifactProperties(
@@ -21,6 +22,11 @@ sealed class ArtifactProperties(
     private fun getProperty(prefix: String, name: String): String {
         return properties.getNonNull("${prefix}_$name")
     }
+
+    class Bom(properties: Properties) : ArtifactProperties(
+        properties = properties,
+        defaultPropertyPrefix = "BOM",
+    )
 
     class Core(properties: Properties) : ArtifactProperties(
         properties = properties,
@@ -69,25 +75,18 @@ sealed class ArtifactProperties(
 
     companion object {
 
-        private const val CORE_MODULE_NAME = "core"
-        private const val CORE_INTERNAL_MODULE_NAME = "core-internal"
-        private const val DATA_STORE_MODULE_NAME = "datastore"
-        private const val DATA_STORE_CORE_MODULE_NAME = "datastore-core"
-        private const val DATA_STORE_CORE_INTERNAL_MODULE_NAME = "datastore-core-internal"
-        private const val DATA_STORE_PREFERENCES_MODULE_NAME = "datastore-preferences"
-        private const val JETPACK_MODULE_NAME = "jetpack"
-
         fun getFor(
             projectName: String,
             properties: Properties,
         ): ArtifactProperties = when (projectName) {
-            CORE_MODULE_NAME -> Core(properties)
-            CORE_INTERNAL_MODULE_NAME -> CoreInternal(properties)
-            DATA_STORE_MODULE_NAME -> DataStore.Typed(properties)
-            DATA_STORE_CORE_MODULE_NAME -> DataStore.Core(properties)
-            DATA_STORE_CORE_INTERNAL_MODULE_NAME -> DataStore.CoreInternal(properties)
-            DATA_STORE_PREFERENCES_MODULE_NAME -> DataStore.Preferences(properties)
-            JETPACK_MODULE_NAME -> Jetpack(properties)
+            ProjectNames.BOM_MODULE_NAME -> Bom(properties)
+            ProjectNames.CORE_MODULE_NAME -> Core(properties)
+            ProjectNames.CORE_INTERNAL_MODULE_NAME -> CoreInternal(properties)
+            ProjectNames.DATA_STORE_MODULE_NAME -> DataStore.Typed(properties)
+            ProjectNames.DATA_STORE_CORE_MODULE_NAME -> DataStore.Core(properties)
+            ProjectNames.DATA_STORE_CORE_INTERNAL_MODULE_NAME -> DataStore.CoreInternal(properties)
+            ProjectNames.DATA_STORE_PREFERENCES_MODULE_NAME -> DataStore.Preferences(properties)
+            ProjectNames.JETPACK_MODULE_NAME -> Jetpack(properties)
             else -> throw IllegalStateException("Unknown Gradle module with name $projectName. Please " +
                 "add artifact properties for this module and corresponding mapping in " +
                 "${ArtifactProperties::class.simpleName}. It is also possible that you changed module " +
