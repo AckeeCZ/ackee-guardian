@@ -32,18 +32,18 @@ internal class TestingPlugin : Plugin<Project> {
         dependencies {
 
             // Coroutines
-            testImplementation(platform(libs.findLibrary("coroutines.bom").get()))
-            testImplementation(libs.findLibrary("coroutines.test"))
+            testImplementation(platform(libs.coroutines.bom))
+            testImplementation(libs.coroutines.test)
 
             // JUnit
-            testImplementation(platform(libs.findLibrary("junit5.bom").get()))
-            testRuntimeOnly(libs.findLibrary("junit.vintage.engine"))
+            testImplementation(platform(libs.junit5.bom))
+            testRuntimeOnly(libs.junit.vintage.engine)
 
             // Kotest
-            testImplementation(libs.findLibrary("kotest.assertions.core"))
-            testImplementation(libs.findLibrary("kotest.framework.api"))
-            testImplementation(libs.findLibrary("kotest.framework.datatest"))
-            testRuntimeOnly(libs.findLibrary("kotest.runner.junit5"))
+            testImplementation(libs.kotest.assertions.core)
+            testImplementation(libs.kotest.framework.api)
+            testImplementation(libs.kotest.framework.datatest)
+            testRuntimeOnly(libs.kotest.runner.junit5)
         }
     }
 }

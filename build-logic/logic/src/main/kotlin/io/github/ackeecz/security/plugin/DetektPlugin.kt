@@ -8,7 +8,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import java.util.Optional
 
 internal class DetektPlugin : Plugin<Project> {
 
@@ -17,7 +16,7 @@ internal class DetektPlugin : Plugin<Project> {
     }
 
     private fun Project.configure() {
-        pluginManager.apply(libs.findPlugin("detekt"))
+        pluginManager.apply(libs.plugins.detekt)
 
         detekt {
             buildUponDefaultConfig = true
@@ -28,7 +27,7 @@ internal class DetektPlugin : Plugin<Project> {
         }
 
         dependencies {
-            detektPlugins(libs.findLibrary("detekt.formatting"))
+            detektPlugins(libs.detekt.formatting)
         }
     }
 
@@ -36,7 +35,7 @@ internal class DetektPlugin : Plugin<Project> {
         extensions.configure(DetektExtension::class, action)
     }
 
-    private fun DependencyHandlerScope.detektPlugins(provider: Optional<Provider<MinimalExternalModuleDependency>>) {
+    private fun DependencyHandlerScope.detektPlugins(provider: Provider<MinimalExternalModuleDependency>) {
         add("detektPlugins", provider.get())
     }
 }

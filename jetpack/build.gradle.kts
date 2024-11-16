@@ -1,8 +1,8 @@
 plugins {
-    id("ackee.security.android.library")
-    id("ackee.security.publishing")
-    id("ackee.security.testing")
-    id("ackee.security.testing.android")
+    alias(libs.plugins.ackeecz.security.android.library)
+    alias(libs.plugins.ackeecz.security.publishing)
+    alias(libs.plugins.ackeecz.security.testing)
+    alias(libs.plugins.ackeecz.security.testing.android)
 }
 
 android {
