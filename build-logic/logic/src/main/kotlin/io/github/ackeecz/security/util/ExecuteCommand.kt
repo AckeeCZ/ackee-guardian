@@ -25,7 +25,7 @@ internal interface ExecuteCommand {
     }
 }
 
-private class ExecuteCommandImpl() : ExecuteCommand {
+private class ExecuteCommandImpl : ExecuteCommand {
 
     override fun invoke(command: String, project: Project): ExecuteCommand.Result {
         val standardOutputStream = ByteArrayOutputStream()

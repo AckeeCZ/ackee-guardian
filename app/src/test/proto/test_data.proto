@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+// TODO Check and adjust package when finalized for libraries
+option java_package = "io.github.ackeecz.security.sample";
+option java_multiple_files = true;
+
+message TestData {
+  int32 first = 1;
+  string second = 2;
+}

@@ -24,6 +24,7 @@ dependencies {
     compileOnly(libs.detekt.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.mavenPublish.gradlePlugin)
+    compileOnly(libs.protobuf.gradlePlugin)
 
     testImplementation(platform(libs.junit5.bom))
     testImplementation(libs.kotest.assertions.core)
@@ -62,6 +63,11 @@ gradlePlugin {
         plugin(
             dependency = libs.plugins.ackeecz.security.testing.android,
             pluginClassSimpleName = "TestingAndroidPlugin",
+        )
+
+        plugin(
+            dependency = libs.plugins.ackeecz.security.testing.protobuf,
+            pluginClassSimpleName = "TestingProtobufPlugin",
         )
     }
 }

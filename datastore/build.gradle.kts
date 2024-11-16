@@ -1,12 +1,11 @@
 import org.gradle.kotlin.dsl.android
-import org.gradle.kotlin.dsl.protobuf
 
 plugins {
     alias(libs.plugins.ackeecz.security.android.library)
     alias(libs.plugins.ackeecz.security.publishing)
     alias(libs.plugins.ackeecz.security.testing)
     alias(libs.plugins.ackeecz.security.testing.android)
-    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ackeecz.security.testing.protobuf)
 }
 
 android {
@@ -24,38 +23,4 @@ dependencies {
     api(libs.androidx.datastore)
 
     testImplementation(testFixtures(projects.datastoreCoreInternal))
-    testImplementation(libs.protobuf.kotlin.lite)
-}
-
-// Setup protobuf configuration, generating lite Java and Kotlin classes
-protobuf {
-    protoc {
-        artifact = libs.protobuf.protoc.get().toString()
-    }
-    generateProtoTasks {
-        // We only need to configure protobuf for tests
-        ofTest().forEach { task ->
-            task.builtins {
-                register("java") {
-                    option("lite")
-                }
-                register("kotlin") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}
-
-// TODO Seems like this can be removed and still be able see generated classes
-androidComponents {
-    beforeVariants(selector = selector()) {
-        android.sourceSets.named(it.name) {
-            val buildDir = layout.buildDirectory.get().asFile
-            val baseProtoPath = "generated/source/proto/${it.name}"
-            java.srcDir(buildDir.resolve("$baseProtoPath/java"))
-            kotlin.srcDir(buildDir.resolve("$baseProtoPath/kotlin"))
-            kotlin.srcDir("src/main/java")
-        }
-    }
 }

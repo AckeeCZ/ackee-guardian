@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.io.File
 
+// TODO Document that clients can use Context.dataStoreFile method to produce a file
 /**
  * Creates an instance of encrypted [DataStore]. Never create more than one instance of
  * DataStore for a given file; doing so can break all DataStore functionality. You should

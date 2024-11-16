@@ -22,10 +22,8 @@ internal class AndroidApplicationPlugin : Plugin<Project> {
         pluginManager.apply(libs.plugins.kotlin.android)
 
         androidApp {
-            compileSdk = Constants.COMPILE_SDK
 
             defaultConfig {
-                minSdk = Constants.MIN_SDK
                 targetSdk = Constants.TARGET_SDK
                 versionCode = 1
                 versionName = "1.0"
