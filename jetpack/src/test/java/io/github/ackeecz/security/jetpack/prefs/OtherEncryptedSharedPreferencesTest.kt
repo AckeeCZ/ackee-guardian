@@ -1,6 +1,6 @@
 package io.github.ackeecz.security.jetpack.prefs
 
-import io.github.ackeecz.security.core.internal.FakeWeakReferenceFactory
+import io.github.ackeecz.security.core.internal.WeakReferenceFactoryFake
 import io.github.ackeecz.security.jetpack.EncryptedSharedPreferences
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.inspectors.forAll
@@ -91,7 +91,7 @@ internal class OtherEncryptedSharedPreferencesTest : EncryptedSharedPreferencesT
 
     @Test
     fun `shared preferences does not store a strong reference to the registered listener`() = runTest {
-        val weakReferenceFactory = FakeWeakReferenceFactory()
+        val weakReferenceFactory = WeakReferenceFactoryFake()
         val underTest = createSut(weakReferenceFactory = weakReferenceFactory)
         var listenerCalled = false
 

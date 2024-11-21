@@ -2,7 +2,7 @@ package io.github.ackeecz.security.verification
 
 import org.gradle.api.Project
 
-internal class StubGetLastTag : GetLastTag {
+internal class GetLastTagStub : GetLastTag {
 
     var result: LastTagResult = LastTagResult.FirstCommitHash("")
 

@@ -1,6 +1,7 @@
 package io.github.ackeecz.security.verification
 
 import io.github.ackeecz.security.util.ExecuteCommand
+import io.github.ackeecz.security.verification.GetLastTag.Companion.BOM_VERSION_TAG_PREFIX
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.internal.cc.base.logger
@@ -13,6 +14,8 @@ internal interface GetLastTag {
     operator fun invoke(project: Project): LastTagResult
 
     companion object {
+
+        const val BOM_VERSION_TAG_PREFIX = "bom-"
 
         operator fun invoke(): GetLastTag {
             return GetLastTagImpl(ExecuteCommand())
@@ -81,7 +84,6 @@ internal class GetLastTagImpl(
 
     companion object {
 
-        private const val BOM_VERSION_TAG_PREFIX = "bom-"
         private const val NO_TAG_FOUND_EXIT_CODE = 128
     }
 }

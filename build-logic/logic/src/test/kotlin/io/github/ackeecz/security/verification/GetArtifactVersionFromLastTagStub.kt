@@ -2,7 +2,7 @@ package io.github.ackeecz.security.verification
 
 import org.gradle.api.Project
 
-internal class StubGetArtifactVersionFromLastTag : GetArtifactVersionFromLastTag {
+internal class GetArtifactVersionFromLastTagStub : GetArtifactVersionFromLastTag {
 
     private val projectsVersions: MutableMap<String, ArtifactVersion?> = mutableMapOf()
 

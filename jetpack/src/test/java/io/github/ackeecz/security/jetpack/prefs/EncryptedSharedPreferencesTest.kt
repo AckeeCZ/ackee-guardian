@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
 import io.github.ackeecz.security.core.MasterKey
 import io.github.ackeecz.security.core.internal.AndroidTestWithKeyStore
-import io.github.ackeecz.security.core.internal.FakeWeakReferenceFactory
+import io.github.ackeecz.security.core.internal.WeakReferenceFactoryFake
 import io.github.ackeecz.security.core.internal.junit.rule.CoroutineRule
 import io.github.ackeecz.security.jetpack.EncryptedSharedPreferences
 import io.github.ackeecz.security.jetpack.EncryptedSharedPreferences.PrefKeyEncryptionScheme
@@ -31,7 +31,7 @@ internal abstract class EncryptedSharedPreferencesTest : AndroidTestWithKeyStore
         getMasterKey: suspend () -> MasterKey = { MasterKey.getOrCreate() },
         prefKeyEncryptionScheme: PrefKeyEncryptionScheme = PrefKeyEncryptionScheme.AES256_SIV,
         prefValueEncryptionScheme: PrefValueEncryptionScheme = PrefValueEncryptionScheme.AES256_GCM,
-        weakReferenceFactory: FakeWeakReferenceFactory = FakeWeakReferenceFactory(),
+        weakReferenceFactory: WeakReferenceFactoryFake = WeakReferenceFactoryFake(),
     ): EncryptedSharedPreferences {
         return EncryptedSharedPreferences.create(
             context = context,

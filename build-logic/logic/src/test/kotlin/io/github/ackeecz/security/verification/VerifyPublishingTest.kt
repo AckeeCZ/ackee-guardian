@@ -9,18 +9,18 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 
-private lateinit var getArtifactVersionFromLastTag: StubGetArtifactVersionFromLastTag
-private lateinit var getReleaseDependentProjects: StubGetReleaseDependentProjects
-private lateinit var checkArtifactUpdateStatus: StubCheckArtifactUpdateStatus
+private lateinit var getArtifactVersionFromLastTag: GetArtifactVersionFromLastTagStub
+private lateinit var getReleaseDependentProjects: GetReleaseDependentProjectsStub
+private lateinit var checkArtifactUpdateStatus: CheckArtifactUpdateStatusStub
 
 private lateinit var underTest: VerifyPublishing
 
 internal class VerifyPublishingTest : FunSpec({
 
     beforeTest {
-        getArtifactVersionFromLastTag = StubGetArtifactVersionFromLastTag()
-        getReleaseDependentProjects = StubGetReleaseDependentProjects()
-        checkArtifactUpdateStatus = StubCheckArtifactUpdateStatus()
+        getArtifactVersionFromLastTag = GetArtifactVersionFromLastTagStub()
+        getReleaseDependentProjects = GetReleaseDependentProjectsStub()
+        checkArtifactUpdateStatus = CheckArtifactUpdateStatusStub()
         underTest = VerifyPublishing(
             getArtifactVersionFromLastTag = getArtifactVersionFromLastTag,
             getReleaseDependentProjects = getReleaseDependentProjects,

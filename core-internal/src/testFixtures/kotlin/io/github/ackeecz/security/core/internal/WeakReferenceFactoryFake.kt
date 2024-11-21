@@ -2,7 +2,7 @@ package io.github.ackeecz.security.core.internal
 
 import java.lang.ref.WeakReference
 
-class FakeWeakReferenceFactory : WeakReferenceFactory {
+class WeakReferenceFactoryFake : WeakReferenceFactory {
 
     private val managedReferents = mutableListOf<WeakReference<*>>()
 

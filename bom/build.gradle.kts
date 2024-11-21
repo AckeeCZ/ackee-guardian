@@ -1,3 +1,5 @@
+import io.github.ackeecz.security.verification.task.VerifyBomVersionTask
+
 plugins {
     `java-platform`
     alias(libs.plugins.ackeecz.security.publishing)
@@ -11,3 +13,5 @@ dependencies {
         api(projects.jetpack)
     }
 }
+
+VerifyBomVersionTask.registerFor(project)

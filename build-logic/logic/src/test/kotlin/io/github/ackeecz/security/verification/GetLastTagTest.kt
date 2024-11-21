@@ -2,7 +2,7 @@ package io.github.ackeecz.security.verification
 
 import io.github.ackeecz.security.testutil.buildProject
 import io.github.ackeecz.security.util.ExecuteCommand
-import io.github.ackeecz.security.util.StubExecuteCommand
+import io.github.ackeecz.security.util.ExecuteCommandStub
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -13,13 +13,13 @@ private val noTagFoundError = ExecuteCommand.Result.Error(
     exitCode = NO_TAG_FOUND_EXIT_CODE,
 )
 
-private lateinit var executeCommand: StubExecuteCommand
+private lateinit var executeCommand: ExecuteCommandStub
 private lateinit var underTest: GetLastTag
 
 internal class GetLastTagTest : FunSpec({
 
     beforeEach {
-        executeCommand = StubExecuteCommand()
+        executeCommand = ExecuteCommandStub()
         underTest = GetLastTagImpl(executeCommand)
     }
 
@@ -28,12 +28,12 @@ internal class GetLastTagTest : FunSpec({
 
         executeCommand.commands
             .firstOrNull()
-            .shouldBe("git describe --tags --match \"bom-*\" --abbrev=0")
+            .shouldBe("git describe --tags --match \"${BOM_VERSION_TAG_PREFIX}*\" --abbrev=0")
     }
 
     test("get first commit hash when last tag does not exist") {
         val firstCommitHash = "de5035f5a24621ea5361279d867ad75abc967ca3"
-        executeCommand.resultStrategy = StubExecuteCommand.ResultStrategy.MultipleExact(
+        executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.MultipleExact(
             noTagFoundError,
             // get hash of the first commit
             ExecuteCommand.Result.Success(commandOutput = firstCommitHash),
@@ -44,8 +44,8 @@ internal class GetLastTagTest : FunSpec({
     }
 
     test("get last tag when last tag exists") {
-        val lastTag = "bom-1.0.0"
-        executeCommand.resultStrategy = StubExecuteCommand.ResultStrategy.OneRepeating(
+        val lastTag = "${BOM_VERSION_TAG_PREFIX}1.0.0"
+        executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             ExecuteCommand.Result.Success(commandOutput = lastTag),
         )
 
@@ -53,7 +53,7 @@ internal class GetLastTagTest : FunSpec({
     }
 
     test("throw if getting first commit hash fails") {
-        executeCommand.resultStrategy = StubExecuteCommand.ResultStrategy.MultipleExact(
+        executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.MultipleExact(
             noTagFoundError,
             // getting first commit fails
             ExecuteCommand.Result.Error(commandOutput = "", exitCode = 100),
@@ -63,13 +63,19 @@ internal class GetLastTagTest : FunSpec({
     }
 
     test("throw if getting last tag fails with other code than $NO_TAG_FOUND_EXIT_CODE") {
-        executeCommand.resultStrategy = StubExecuteCommand.ResultStrategy.MultipleExact(
+        executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.MultipleExact(
             ExecuteCommand.Result.Error(commandOutput = "", exitCode = NO_TAG_FOUND_EXIT_CODE + 1),
         )
 
         shouldThrow<LastTagException> { underTest() }
     }
-})
+}) {
+
+    companion object {
+
+        const val BOM_VERSION_TAG_PREFIX = "bom-"
+    }
+}
 
 private operator fun GetLastTag.invoke(): LastTagResult {
     return invoke(buildProject())
