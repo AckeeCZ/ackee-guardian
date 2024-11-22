@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.ackeecz.security.publishing)
     alias(libs.plugins.ackeecz.security.testing)
     alias(libs.plugins.ackeecz.security.testing.android)
+    alias(libs.plugins.ackeecz.security.tink)
 }
 
 android {
@@ -19,9 +20,6 @@ dependencies {
 
     implementation(platform(libs.coroutines.bom))
     implementation(libs.coroutines.android)
-
-    // TODO Change to compile-only
-    implementation(libs.tink.android)
 
     testImplementation(testFixtures(projects.coreInternal))
     testImplementation(libs.androidx.coreKtx)

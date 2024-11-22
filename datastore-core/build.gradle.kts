@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.ackeecz.security.android.library)
     alias(libs.plugins.ackeecz.security.publishing)
+    alias(libs.plugins.ackeecz.security.tink)
 }
 
 android {
@@ -14,7 +15,4 @@ dependencies {
 
     implementation(platform(libs.coroutines.bom))
     implementation(libs.coroutines.android)
-
-    // TODO Change to compileOnly and add min version constraint for clients to use
-    implementation(libs.tink.android)
 }
