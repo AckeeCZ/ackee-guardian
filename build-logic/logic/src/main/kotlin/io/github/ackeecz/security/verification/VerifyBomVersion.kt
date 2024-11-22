@@ -1,41 +1,42 @@
 package io.github.ackeecz.security.verification
 
 import org.gradle.api.Project
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
- * Verifies if the last BOM tag version matches the current BOM version to keep in sync BOM versions
+ * Verifies if the current BOM tag version matches the current BOM version to keep in sync BOM versions
  * with release tags and also enforce increase of BOM version during publishing process.
  */
-internal class VerifyBomVersion(
-    private val getLastTag: GetLastTag,
-    private val getArtifactVersionFromLastTag: GetArtifactVersionFromLastTag,
+internal class VerifyBomVersion @VisibleForTesting constructor(
+    private val getCurrentTag: GetCurrentTag,
+    private val getArtifactVersionFromTag: GetArtifactVersionFromTag,
 ) {
 
     constructor() : this(
-        getLastTag = GetLastTag(),
-        getArtifactVersionFromLastTag = GetArtifactVersionFromLastTag(),
+        getCurrentTag = GetCurrentTag(),
+        getArtifactVersionFromTag = GetArtifactVersionFromTag(),
     )
 
     operator fun invoke(project: Project): Result {
-        return when (val result = getLastTag(project)) {
-            is LastTagResult.Tag -> processTag(result, project)
-            is LastTagResult.FirstCommitHash -> Result.Error.TagMissing
+        return when (val result = getCurrentTag(project)) {
+            is TagResult.Tag -> processTag(result, project)
+            is TagResult.FirstCommitHash -> Result.Error.TagMissing
         }
     }
 
-    private fun processTag(result: LastTagResult.Tag, project: Project): Result {
-        val lastTag = result.value
-        val bomArtifactVersion = getArtifactVersionFromLastTag(project)
-        val lastTagVersion = lastTag.substringAfter(
-            delimiter = GetLastTag.BOM_VERSION_TAG_PREFIX,
+    private fun processTag(tagResult: TagResult.Tag, project: Project): Result {
+        val tagValue = tagResult.value
+        val bomArtifactVersion = getArtifactVersionFromTag(project, tagResult)
+        val currentTagVersion = tagValue.substringAfter(
+            delimiter = GetTag.BOM_VERSION_TAG_PREFIX,
             missingDelimiterValue = MISSING_TAG_PREFIX_FALLBACK,
         )
-        return when (lastTagVersion) {
+        return when (currentTagVersion) {
             bomArtifactVersion?.value -> Result.Success
-            MISSING_TAG_PREFIX_FALLBACK -> Result.Error.UnexpectedTagFormat(lastTag)
+            MISSING_TAG_PREFIX_FALLBACK -> Result.Error.UnexpectedTagFormat(tagValue)
             else -> Result.Error.NotMatchingVersion(
                 bomArtifactVersion = bomArtifactVersion,
-                lastTagVersion = lastTagVersion,
+                currentTagVersion = currentTagVersion,
             )
         }
     }
@@ -55,23 +56,28 @@ internal class VerifyBomVersion(
 
             data class NotMatchingVersion(
                 val bomArtifactVersion: ArtifactVersion?,
-                val lastTagVersion: String,
+                val currentTagVersion: String,
             ) : Error {
 
-                override val message = "BOM artifact version (${bomArtifactVersion?.value}) and last tag version " +
-                    "($lastTagVersion) do not match. You probably forgot to increase BOM version " +
+                override val message = "BOM artifact version (${bomArtifactVersion?.value}) and current tag version " +
+                    "($currentTagVersion) do not match. You probably forgot to increase BOM version " +
                     "or you created a tag with incorrect version."
             }
 
             data class UnexpectedTagFormat(val tag: String) : Error {
 
-                override val message = "BOM tag has unexpected format: $tag"
+                override val message = "BOM tag has unexpected format. Expected '$EXPECTED_TAG_FORMAT' but was '$tag'"
             }
 
             object TagMissing : Error {
 
-                override val message = "BOM tag in format ${GetLastTag.BOM_VERSION_TAG_PREFIX}* is missing in Git history"
+                override val message = "BOM tag in format $EXPECTED_TAG_FORMAT is missing in Git history"
             }
+        }
+
+        companion object {
+
+            private const val EXPECTED_TAG_FORMAT = "${GetTag.BOM_VERSION_TAG_PREFIX}*"
         }
     }
 }

@@ -4,7 +4,7 @@ import io.github.ackeecz.security.testutil.buildProject
 import io.github.ackeecz.security.util.ExecuteCommand
 import io.github.ackeecz.security.util.ExecuteCommandStub
 import io.github.ackeecz.security.util.createErrorExecuteCommandResult
-import io.github.ackeecz.security.verification.GetLastTagTest.Companion.BOM_VERSION_TAG_PREFIX
+import io.github.ackeecz.security.verification.GetTagTest.Companion.BOM_VERSION_TAG_PREFIX
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -39,47 +39,43 @@ private const val PROPERTIES_FILE_CONTENT = """
     CORE_POM_DESCRIPTION=Core artifact of the Ackee Security library. Contains general-purpose security features.
 """
 
-private lateinit var getLastTag: GetLastTagStub
 private lateinit var executeCommand: ExecuteCommandStub
 private lateinit var properties: Properties
 
-internal class GetArtifactVersionFromLastTagTest : FunSpec({
+internal class GetArtifactVersionFromTagTest : FunSpec({
 
-    fun createSut(): GetArtifactVersionFromLastTag {
-        return GetArtifactVersionFromLastTagImpl(
-            getLastTag = getLastTag,
-            executeCommand = executeCommand,
-        )
+    fun createSut(): GetArtifactVersionFromTag {
+        return GetArtifactVersionFromTagImpl(executeCommand = executeCommand)
     }
 
     beforeEach {
-        getLastTag = GetLastTagStub()
         executeCommand = ExecuteCommandStub()
         properties = Properties().also { it.load(PROPERTIES_FILE_CONTENT.trimIndent().byteInputStream()) }
     }
 
-    test("call correct git command with last tag") {
-        val lastTagResult = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.0.0")
-        getLastTag.result = lastTagResult
-        val expectedCommand = "git show ${lastTagResult.value}:$PROPERTIES_FILE_NAME"
+    test("call correct git command with tag") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.0.0")
+        val expectedCommand = "git show ${tagResult.value}:$PROPERTIES_FILE_NAME"
 
-        runCatching { createSut().invoke(buildProject()) }
+        runCatching { createSut().invoke(buildProject(), tagResult) }
 
         executeCommand.commands.firstOrNull() shouldBe expectedCommand
     }
 
-    test("throw if last tag exists, but git command for getting last tag properties fails") {
-        getLastTag.result = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.0.0")
+    test("throw if tag exists, but git command for getting tag properties fails") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.0.0")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             createErrorExecuteCommandResult(),
         )
         val underTest = createSut()
 
-        shouldThrow<LastTagPropertiesException> { underTest(buildProject()) }
+        shouldThrow<TagPropertiesException> {
+            underTest(buildProject(), tagResult)
+        }
     }
 
-    test("get artifact version from last tag") {
-        getLastTag.result = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
+    test("get artifact version from tag") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
         val expectedVersion = "1.0.0"
         properties[VERSION_PROPERTY_NAME] = expectedVersion
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
@@ -88,13 +84,15 @@ internal class GetArtifactVersionFromLastTagTest : FunSpec({
         )
         val underTest = createSut()
 
-        underTest(buildProject(name = PROJECT_NAME))?.value shouldBe expectedVersion
+        val actualVersion = underTest(buildProject(name = PROJECT_NAME), tagResult)
+
+        actualVersion?.value shouldBe expectedVersion
     }
 
     // This means that a new artifact was added to the library and was not released yet, which is a valid state
     @Suppress("MaxLineLength")
-    test("get null artifact version when last tag exists, properties are parsed, but parsing of the version fails and current project version is initial one") {
-        getLastTag.result = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
+    test("get null artifact version when tag exists, properties are parsed, but parsing of the version fails and current project version is initial one") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             // Return properties from the above tag
             ExecuteCommand.Result.Success(properties.writeToString())
@@ -102,11 +100,11 @@ internal class GetArtifactVersionFromLastTagTest : FunSpec({
         val project = buildProject(name = PROJECT_NAME).also { it.version = EXPECTED_INITIAL_VERSION }
         val underTest = createSut()
 
-        underTest(project).shouldBeNull()
+        underTest(project, tagResult).shouldBeNull()
     }
 
-    test("throw if last tag exists, properties are parsed, but parsing of the version fails and current project version is not initial one") {
-        getLastTag.result = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
+    test("throw if tag exists, properties are parsed, but parsing of the version fails and current project version is not initial one") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             // Return properties from the above tag
             ExecuteCommand.Result.Success(properties.writeToString())
@@ -114,22 +112,24 @@ internal class GetArtifactVersionFromLastTagTest : FunSpec({
         val project = buildProject(name = PROJECT_NAME).also { it.version = NOT_INITIAL_VERSION }
         val underTest = createSut()
 
-        shouldThrow<VersionUnparseableException> { underTest(project) }
+        shouldThrow<VersionUnparseableException> { underTest(project, tagResult) }
     }
 
-    test("throw if last tag exists, but parsing of properties fails") {
-        getLastTag.result = LastTagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
+    test("throw if tag exists, but parsing of properties fails") {
+        val tagResult = TagResult.Tag("${BOM_VERSION_TAG_PREFIX}1.1.0")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             // Return properties from the above tag
             ExecuteCommand.Result.Success("invalid properties content")
         )
         val underTest = createSut()
 
-        shouldThrow<VersionUnparseableException> { underTest(buildProject(name = PROJECT_NAME)) }
+        shouldThrow<VersionUnparseableException> {
+            underTest(buildProject(name = PROJECT_NAME), tagResult)
+        }
     }
 
     test("get null artifact version when fallback to first commit hash and project version matches the expected initial version") {
-        getLastTag.result = LastTagResult.FirstCommitHash("de5035f5a24621ea5361279d867ad75abc967ca3")
+        val tagResult = TagResult.FirstCommitHash("de5035f5a24621ea5361279d867ad75abc967ca3")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             // Return properties from the above commit
             ExecuteCommand.Result.Success(properties.writeToString())
@@ -137,11 +137,11 @@ internal class GetArtifactVersionFromLastTagTest : FunSpec({
         val project = buildProject().also { it.version = EXPECTED_INITIAL_VERSION }
         val underTest = createSut()
 
-        underTest(project).shouldBeNull()
+        underTest(project, tagResult).shouldBeNull()
     }
 
     test("throw if fallback to first commit hash and project version does not match the expected initial version") {
-        getLastTag.result = LastTagResult.FirstCommitHash("de5035f5a24621ea5361279d867ad75abc967ca3")
+        val tagResult = TagResult.FirstCommitHash("de5035f5a24621ea5361279d867ad75abc967ca3")
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
             // Return properties from the above commit
             ExecuteCommand.Result.Success(properties.writeToString())
@@ -149,7 +149,9 @@ internal class GetArtifactVersionFromLastTagTest : FunSpec({
         val project = buildProject().also { it.version = NOT_INITIAL_VERSION }
         val underTest = createSut()
 
-        shouldThrow<UnexpectedInitialVersionException> { underTest(project) }
+        shouldThrow<UnexpectedInitialVersionException> {
+            underTest(project, tagResult)
+        }
     }
 })
 

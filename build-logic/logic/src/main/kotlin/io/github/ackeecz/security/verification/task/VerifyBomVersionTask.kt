@@ -31,7 +31,7 @@ public abstract class VerifyBomVersionTask : DefaultTask() {
             val taskClass = VerifyBomVersionTask::class.java
             project.tasks.register(taskClass.getTaskName(), taskClass) {
                 group = "verification"
-                description = "Verifies that current BOM version matches the last tag version"
+                description = "Verifies that current BOM version matches the current tag version"
             }
         }
     }

@@ -4,7 +4,7 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
 import io.github.ackeecz.security.properties.LibraryProperties
 import io.github.ackeecz.security.util.PublishableProject
-import io.github.ackeecz.security.verification.task.CheckIfUpdateNeededTask
+import io.github.ackeecz.security.verification.task.CheckIfUpdateNeededSinceCurrentTagTask
 import io.github.ackeecz.security.verification.task.VerifyPublishingTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -66,7 +66,7 @@ internal class PublishingPlugin : Plugin<Project> {
         }
 
         excludeTestFixturesFromPublishing()
-        CheckIfUpdateNeededTask.registerFor(project)
+        CheckIfUpdateNeededSinceCurrentTagTask.registerFor(project)
         VerifyPublishingTask.registerFor(project)
     }
 }

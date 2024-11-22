@@ -14,24 +14,21 @@ private val noTagFoundError = ExecuteCommand.Result.Error(
 )
 
 private lateinit var executeCommand: ExecuteCommandStub
-private lateinit var underTest: GetLastTag
+private lateinit var underTest: GetTag
 
-internal class GetLastTagTest : FunSpec({
+internal abstract class GetTagTest(
+    private val createSut: () -> GetTag,
+    body: FunSpec.() -> Unit,
+) : FunSpec({
 
     beforeEach {
         executeCommand = ExecuteCommandStub()
-        underTest = GetLastTagImpl(executeCommand)
+        underTest = createSut()
     }
 
-    test("call correct first command for getting latest BOM version tag") {
-        underTest()
+    body()
 
-        executeCommand.commands
-            .firstOrNull()
-            .shouldBe("git describe --tags --match \"${BOM_VERSION_TAG_PREFIX}*\" --abbrev=0")
-    }
-
-    test("get first commit hash when last tag does not exist") {
+    test("get first commit hash when tag does not exist") {
         val firstCommitHash = "de5035f5a24621ea5361279d867ad75abc967ca3"
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.MultipleExact(
             noTagFoundError,
@@ -39,17 +36,17 @@ internal class GetLastTagTest : FunSpec({
             ExecuteCommand.Result.Success(commandOutput = firstCommitHash),
         )
 
-        underTest() shouldBe LastTagResult.FirstCommitHash(firstCommitHash)
+        underTest() shouldBe TagResult.FirstCommitHash(firstCommitHash)
         assertCorrectFirstCommitHashCommand()
     }
 
-    test("get last tag when last tag exists") {
-        val lastTag = "${BOM_VERSION_TAG_PREFIX}1.0.0"
+    test("get tag when it exists") {
+        val tag = "${BOM_VERSION_TAG_PREFIX}1.0.0"
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.OneRepeating(
-            ExecuteCommand.Result.Success(commandOutput = lastTag),
+            ExecuteCommand.Result.Success(commandOutput = tag),
         )
 
-        underTest() shouldBe LastTagResult.Tag(lastTag)
+        underTest() shouldBe TagResult.Tag(tag)
     }
 
     test("throw if getting first commit hash fails") {
@@ -62,12 +59,12 @@ internal class GetLastTagTest : FunSpec({
         shouldThrow<FirstCommitHashException> { underTest() }
     }
 
-    test("throw if getting last tag fails with other code than $NO_TAG_FOUND_EXIT_CODE") {
+    test("throw if getting tag fails with other code than $NO_TAG_FOUND_EXIT_CODE") {
         executeCommand.resultStrategy = ExecuteCommandStub.ResultStrategy.MultipleExact(
             ExecuteCommand.Result.Error(commandOutput = "", exitCode = NO_TAG_FOUND_EXIT_CODE + 1),
         )
 
-        shouldThrow<LastTagException> { underTest() }
+        shouldThrow<TagException> { underTest() }
     }
 }) {
 
@@ -77,7 +74,7 @@ internal class GetLastTagTest : FunSpec({
     }
 }
 
-private operator fun GetLastTag.invoke(): LastTagResult {
+private operator fun GetTag.invoke(): TagResult {
     return invoke(buildProject())
 }
 
@@ -86,3 +83,28 @@ private fun assertCorrectFirstCommitHashCommand() {
         .getOrNull(1)
         .shouldBe("git rev-list --max-parents=0 HEAD")
 }
+
+internal class GetCurrentTagTest : GetTagTest(createSut = { GetCurrentTagImpl(executeCommand) }, {
+
+    test("call correct first command for getting current BOM version tag") {
+        underTest()
+
+        executeCommand.commands
+            .firstOrNull()
+            .shouldBe("git describe --tags --match \"${BOM_VERSION_TAG_PREFIX}*\" --abbrev=0")
+    }
+})
+
+internal class GetPreviousTagTest : GetTagTest(createSut = { GetPreviousTagImpl(executeCommand) }, {
+
+    test("call correct first command for getting previous BOM version tag") {
+        val expectedCommand = "git describe --tags --match \"${BOM_VERSION_TAG_PREFIX}*\" --abbrev=0 " +
+            "\$(git rev-list --tags=\"${BOM_VERSION_TAG_PREFIX}*\" --skip=1 --max-count=1 HEAD)"
+
+        underTest()
+
+        executeCommand.commands
+            .firstOrNull()
+            .shouldBe(expectedCommand)
+    }
+})
