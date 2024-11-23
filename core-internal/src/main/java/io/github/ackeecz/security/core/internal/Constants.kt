@@ -1,6 +1,5 @@
 package io.github.ackeecz.security.core.internal
 
-// TODO Check and adjust namespace when finalized for libraries
 /**
  * Default name of the SharedPreferences file used for storing keysets for Ackee security library
  */

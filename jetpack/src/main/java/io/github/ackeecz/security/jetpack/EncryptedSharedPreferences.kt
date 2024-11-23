@@ -29,6 +29,7 @@ import com.google.crypto.tink.daead.DeterministicAeadConfig
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import com.google.crypto.tink.subtle.Base64
 import io.github.ackeecz.security.core.MasterKey
+import io.github.ackeecz.security.core.internal.Base64Value
 import io.github.ackeecz.security.core.internal.SynchronizedDataHolder
 import io.github.ackeecz.security.core.internal.WeakReferenceFactory
 import kotlinx.coroutines.CoroutineDispatcher
@@ -73,7 +74,7 @@ private const val VALUE_KEYSET_ALIAS = "__androidx_security_crypto_encrypted_pre
  *     prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
  *     prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
  * )
- * // Use [EncryptedSharedPreferences] and Editor as you would normally use [SharedPreferences]
+ * // Use EncryptedSharedPreferences and Editor as you would normally use SharedPreferences
  * sharedPreferences.edit {
  *     putString("secret_key", "secret_value")
  * }
@@ -235,8 +236,10 @@ public interface EncryptedSharedPreferences {
         /**
          * Creates an instance of [EncryptedSharedPreferences]
          *
+         * @param context Context of the application.
          * @param fileName The name of the file to open. Can not contain path separators.
-         * @param getMasterKey Returns the master key to use.
+         * @param getMasterKey Returns the master key to use. Master key is used to encrypt/decrypt
+         * generated data encryption key that is then used to encrypt/decrypt the preferences.
          * @param prefKeyEncryptionScheme The scheme to use for encrypting keys.
          * @param prefValueEncryptionScheme The scheme to use for encrypting values.
          *
@@ -960,7 +963,3 @@ private fun String?.toDecryptedKey(): PreferenceKey.Decrypted? {
 private fun String.toEncryptedKey(): PreferenceKey.Encrypted {
     return PreferenceKey.Encrypted(Base64Value(this))
 }
-
-// TODO Move to core
-@JvmInline
-internal value class Base64Value(val value: String)

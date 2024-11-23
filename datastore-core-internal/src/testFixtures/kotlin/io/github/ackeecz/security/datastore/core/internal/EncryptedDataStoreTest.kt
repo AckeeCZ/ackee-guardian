@@ -228,7 +228,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     @Test
     fun `generate same data encryption key for multiple encrypted DataStores concurrently`() = runTest {
         val expectedData = createExpectedData()
-        repeat(50) { keyAliasIndex ->
+        repeat(times = 50) { keyAliasIndex ->
             fun createDataStoresWithScopes(): Map<DataStore<DataStoreData>, CoroutineScope> {
                 return (0 until 8).map { fileIndex ->
                     val cryptoParams = createDefaultCryptoParams().copy(keysetAlias = "alias_$keyAliasIndex")
@@ -270,7 +270,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     protected suspend fun <T : Any> TestScope.testDataStoreDelegateSingleton(
         createDelegateWrapper: (keyAliasIndex: Int) -> DataStoreDelegateWrapper<T>,
     ) {
-        repeat(50) { keyAliasIndex ->
+        repeat(times = 50) { keyAliasIndex ->
             val dataStoreDelegateWrapper = createDelegateWrapper(keyAliasIndex)
 
             val dataStores = (0 until 8)

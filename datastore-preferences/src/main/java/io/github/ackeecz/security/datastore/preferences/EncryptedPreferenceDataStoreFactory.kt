@@ -27,7 +27,7 @@ private const val REQUIRED_PREFERENCES_FILE_EXTENSION = "preferences_pb"
 
 /**
  * Creates an instance of encrypted preferences [DataStore]. Never create more than one instance of
- * DataStore for a given file; doing so can break all DataStore functionality. You should
+ * DataStore for a given file. Doing so can break all DataStore functionality. You should
  * consider managing your DataStore instance as a singleton.
  *
  * @param context Context of the application. It is safe to pass an Activity context, but best

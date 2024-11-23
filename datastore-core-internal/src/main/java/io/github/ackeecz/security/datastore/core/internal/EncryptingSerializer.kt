@@ -16,7 +16,7 @@ import java.io.OutputStream
 
 /**
  * [Serializer] that encrypts and decrypts [delegate]. Crypto objects are configured using
- * [cryptoParams].
+ * [DataStoreCryptoParams].
  */
 public class EncryptingSerializer<T>(
     context: Context,
