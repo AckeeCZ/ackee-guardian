@@ -604,7 +604,6 @@ private class EncryptedSharedPreferencesImpl(
             EncryptedType.FLOAT -> getFloat()
             EncryptedType.BOOLEAN -> get() != 0.toByte()
             EncryptedType.STRING_SET -> decodeStringSet()
-            else -> throw SecurityException("Unhandled type for encrypted pref value: $type")
         }
     }
 
@@ -747,15 +746,17 @@ private class EncryptedSharedPreferencesImpl(
                 .withKeyTemplate(prefKeyEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, KEY_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
-                .build().keysetHandle
+                .build()
+                .keysetHandle
             val aeadKeysetHandle = AndroidKeysetManager.Builder()
                 .withKeyTemplate(prefValueEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, VALUE_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
-                .build().keysetHandle
+                .build()
+                .keysetHandle
 
-            val keyDeterministicAead = daeadKeysetHandle.getPrimitive<DeterministicAead>(DeterministicAead::class.java)
-            val valueAead = aeadKeysetHandle.getPrimitive<Aead>(Aead::class.java)
+            val keyDeterministicAead = daeadKeysetHandle.getPrimitive(DeterministicAead::class.java)
+            val valueAead = aeadKeysetHandle.getPrimitive(Aead::class.java)
 
             return CryptoObjects(keyDeterministicAead, valueAead)
         }
