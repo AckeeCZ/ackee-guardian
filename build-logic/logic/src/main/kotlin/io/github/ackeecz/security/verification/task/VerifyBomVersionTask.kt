@@ -1,5 +1,6 @@
 package io.github.ackeecz.security.verification.task
 
+import io.github.ackeecz.security.util.Constants
 import io.github.ackeecz.security.util.getTaskName
 import io.github.ackeecz.security.verification.VerifyBomVersion
 import org.gradle.api.DefaultTask
@@ -30,7 +31,7 @@ public abstract class VerifyBomVersionTask : DefaultTask() {
         public fun registerFor(project: Project) {
             val taskClass = VerifyBomVersionTask::class.java
             project.tasks.register(taskClass.getTaskName(), taskClass) {
-                group = "verification"
+                group = Constants.ACKEE_TASKS_GROUP
                 description = "Verifies that current BOM version matches the current tag version"
             }
         }

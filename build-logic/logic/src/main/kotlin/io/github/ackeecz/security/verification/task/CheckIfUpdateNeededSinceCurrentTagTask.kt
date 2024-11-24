@@ -1,5 +1,6 @@
 package io.github.ackeecz.security.verification.task
 
+import io.github.ackeecz.security.util.Constants
 import io.github.ackeecz.security.util.getTaskName
 import io.github.ackeecz.security.verification.ArtifactUpdateStatus
 import io.github.ackeecz.security.verification.CheckArtifactUpdateStatus
@@ -48,7 +49,7 @@ internal abstract class CheckIfUpdateNeededSinceCurrentTagTask : DefaultTask() {
         fun registerFor(project: Project) {
             val taskClass = CheckIfUpdateNeededSinceCurrentTagTask::class.java
             project.tasks.register(taskClass.getTaskName(), taskClass) {
-                group = "verification"
+                group = Constants.ACKEE_TASKS_GROUP
                 description = "Checks if the artifact has changed since the current release tag and needs to be updated (new version published)"
             }
         }

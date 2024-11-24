@@ -1,5 +1,6 @@
 package io.github.ackeecz.security.verification.task
 
+import io.github.ackeecz.security.util.Constants
 import io.github.ackeecz.security.util.getTaskName
 import io.github.ackeecz.security.verification.VerifyPublishing
 import org.gradle.api.DefaultTask
@@ -33,7 +34,7 @@ internal abstract class VerifyPublishingTask : DefaultTask() {
         fun registerFor(project: Project) {
             val taskClass = VerifyPublishingTask::class.java
             project.tasks.register(taskClass.getTaskName(), taskClass) {
-                group = "verification"
+                group = Constants.ACKEE_TASKS_GROUP
                 description = "Verifies that all dependencies between this library artifacts are compatible"
             }
         }

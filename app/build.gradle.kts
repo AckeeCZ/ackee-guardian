@@ -1,4 +1,5 @@
 import io.github.ackeecz.security.properties.LibraryProperties
+import io.github.ackeecz.security.util.Constants
 
 plugins {
     alias(libs.plugins.ackeecz.security.android.application)
@@ -60,7 +61,7 @@ dependencies {
  * or binary compatibility of the dependent artifacts.
  */
 tasks.register("artifactsTests") {
-    group = "verification"
+    group = Constants.ACKEE_TASKS_GROUP
     description = "Tests published artifacts of the library"
     ext.set(includeArtifactsTestsProperty, true)
     dependsOn("testDebugUnitTest")

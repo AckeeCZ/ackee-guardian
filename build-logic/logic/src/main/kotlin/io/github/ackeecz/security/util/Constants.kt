@@ -11,4 +11,6 @@ public object Constants {
 
     public val JAVA_VERSION: JavaVersion = JavaVersion.VERSION_11
     public val JVM_TARGET: JvmTarget = JvmTarget.JVM_11
+
+    public const val ACKEE_TASKS_GROUP: String = "ackee"
 }
