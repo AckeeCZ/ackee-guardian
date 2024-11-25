@@ -74,6 +74,7 @@ protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }
 # Contention plugins defined by this project
 ackeecz-security-android-application = { id = "ackeecz.security.android.application" }
 ackeecz-security-android-library = { id = "ackeecz.security.android.library" }
+ackeecz-security-preflightchecks = { id = "ackeecz.security.preflightchecks" }
 ackeecz-security-publishing = { id = "ackeecz.security.publishing" }
 ackeecz-security-testfixtures = { id = "ackeecz.security.testfixtures" }
 ackeecz-security-testing = { id = "ackeecz.security.testing" }

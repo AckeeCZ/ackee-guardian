@@ -31,9 +31,10 @@ internal abstract class VerifyPublishingTask : DefaultTask() {
 
     companion object {
 
+        val NAME = VerifyPublishingTask::class.java.getTaskName()
+
         fun registerFor(project: Project) {
-            val taskClass = VerifyPublishingTask::class.java
-            project.tasks.register(taskClass.getTaskName(), taskClass) {
+            project.tasks.register(NAME, VerifyPublishingTask::class.java) {
                 group = Constants.ACKEE_TASKS_GROUP
                 description = "Verifies that all dependencies between this library artifacts are compatible"
             }

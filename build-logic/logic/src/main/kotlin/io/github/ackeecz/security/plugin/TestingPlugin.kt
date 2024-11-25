@@ -15,6 +15,8 @@ internal class TestingPlugin : Plugin<Project> {
     }
 
     private fun Project.configure() {
+        pluginManager.apply(libs.plugins.gradle.testLogger)
+
         androidBase {
             configureTestOptions()
         }

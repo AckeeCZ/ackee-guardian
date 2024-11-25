@@ -46,6 +46,11 @@ gradlePlugin {
         )
 
         plugin(
+            dependency = libs.plugins.ackeecz.security.preflightchecks,
+            pluginClassSimpleName = "RegisterPreflightChecksPlugin",
+        )
+
+        plugin(
             dependency = libs.plugins.ackeecz.security.publishing,
             pluginClassSimpleName = "PublishingPlugin",
         )

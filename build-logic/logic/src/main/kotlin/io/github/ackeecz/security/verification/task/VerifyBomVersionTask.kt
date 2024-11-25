@@ -28,9 +28,10 @@ public abstract class VerifyBomVersionTask : DefaultTask() {
 
     public companion object {
 
+        public val NAME: String = VerifyBomVersionTask::class.java.getTaskName()
+
         public fun registerFor(project: Project) {
-            val taskClass = VerifyBomVersionTask::class.java
-            project.tasks.register(taskClass.getTaskName(), taskClass) {
+            project.tasks.register(NAME, VerifyBomVersionTask::class.java) {
                 group = Constants.ACKEE_TASKS_GROUP
                 description = "Verifies that current BOM version matches the current tag version"
             }
