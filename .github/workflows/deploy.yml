@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      # Gradle build logic relies on this tag format, so if you need to change it, you need to change
+      # it there as well.
+      - bom-*
+
+jobs:
+  # This job's steps must be synced with prePublishCheck Gradle task's checks to ensure that
+  # we check required stuff on CI and at the same time developers can run the Gradle task to verify
+  # their changes before publishing.
+  preflight_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./github/actions/setup
+      - uses: ./github/actions/basic-preflight-check
+
+      - name: Verify publishing
+        run: ./gradlew verifyPublishing
+
+      - name: Verify BOM version
+        run: ./gradlew verifyBomVersion
+
+      - name: Artifacts tests
+        # We need to publish the latest versions to Maven local first before we can run tests
+        # on published artifacts
+        run: |
+          ./gradlew publishToMavenLocal
+          ./gradlew artifactsTests
+
+  publish:
+    needs: preflight_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./github/actions/setup
+
+      - name: Publish to Maven Central
+        env:
+          GPG_KEY: ${{ secrets.ANDROID_GPG_KEY }}
+          GPG_PASSWORD: ${{ secrets.ANDROID_SIGNING_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.ANDROID_MAVEN_CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ANDROID_MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          ./gradlew --stacktrace publishAndReleaseToMavenCentral \
+            -PsigningInMemoryKey=$GPG_KEY \
+            -PsigningInMemoryKeyPassword=$GPG_PASSWORD \
+            -PmavenCentralUsername=$MAVEN_USERNAME \
+            -PmavenCentralPassword=$MAVEN_PASSWORD

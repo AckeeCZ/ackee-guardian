@@ -16,6 +16,8 @@ internal interface GetTag {
 
     companion object {
 
+        // Deploy Github workflow relies on this tag format, so if you need to change it, you need
+        // to change it there as well.
         const val BOM_VERSION_TAG_PREFIX = "bom-"
     }
 }
