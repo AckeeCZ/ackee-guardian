@@ -42,7 +42,7 @@ internal class EncryptedFileTest : AndroidTestWithKeyStore() {
         encryptionScheme: EncryptedFile.FileEncryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
         getMasterKey: suspend () -> MasterKey = { MasterKey.getOrCreate() },
     ): EncryptedFile.Builder {
-        return EncryptedFile.Builder(context, file, encryptionScheme, getMasterKey)
+        return EncryptedFile.Builder(file, context, encryptionScheme, getMasterKey)
             .setBackgroundDispatcher(coroutineRule.testDispatcher)
     }
 

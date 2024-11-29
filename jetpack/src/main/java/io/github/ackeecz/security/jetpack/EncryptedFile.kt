@@ -57,8 +57,8 @@ import java.security.GeneralSecurityException
  * val getMasterKey = suspend { MasterKey.getOrCreate() }
  * val file = File(context.filesDir, "secret_data")
  * val encryptedFile = EncryptedFile.Builder(
- *     context = context,
  *     file = file,
+ *     context = context,
  *     encryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
  *     getMasterKey = getMasterKey,
  * ).build()
@@ -213,8 +213,8 @@ public class EncryptedFile private constructor(private val builder: Builder) {
     }
 
     public class Builder public constructor(
-        context: Context,
         internal val file: File,
+        context: Context,
         internal val encryptionScheme: FileEncryptionScheme,
         internal val getMasterKey: suspend () -> MasterKey,
     ) {
