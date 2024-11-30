@@ -1,0 +1,2 @@
+This project includes code derived from the Jetpack Security Crypto library,
+developed by Google LLC, and licensed under the Apache License 2.0.

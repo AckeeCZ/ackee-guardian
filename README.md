@@ -5,10 +5,10 @@
 
 ## Overview
 
-Ackee Security is a library focusing on a security-related logic. In Ackee we mainly use it to share
-some common security-related implementations across our projects, but it contains useful logic suited
-for anyone's needs. More specifically, you can use it as a 100% compatible replacement for [Jetpack
-Security Crypto](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary) 
+Ackee Security is a library focusing on a security-related logic. In [Ackee](https://www.ackee.cz/) 
+we mainly use it to share some common security-related implementations across our projects, but it 
+contains useful logic suited for anyone's needs. More specifically, you can use it as a 100% 
+compatible replacement for [Jetpack Security Crypto](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary) 
 library and there is more!
 
 ## Architecture
@@ -283,4 +283,5 @@ val sharedPreferences: SharedPreferences = encryptedSharedPreferences.adaptToSha
 Developed by [Ackee](https://www.ackee.cz) team with 💙. 
 
 `MasterKey` class from `core` and `EncryptedFile` and `EncryptedSharedPreferences` classes from 
-`jetpack` are based on [Jetpack Security Crypto library](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary).
+`jetpack` are based on [Jetpack Security Crypto library](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary)
+published by Google LLC, under the Apache License 2.0.

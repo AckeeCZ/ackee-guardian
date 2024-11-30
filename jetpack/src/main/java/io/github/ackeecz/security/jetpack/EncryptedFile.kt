@@ -1,4 +1,3 @@
-// TODO Should this licence be here and for other JetSec original files?
 /*
  * Copyright 2018 The Android Open Source Project
  *
@@ -13,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This file is based on the original EncryptedFile from Jetpack Security Crypto library
+ * https://developer.android.com/reference/kotlin/androidx/security/crypto/EncryptedFile
  */
 package io.github.ackeecz.security.jetpack
 
