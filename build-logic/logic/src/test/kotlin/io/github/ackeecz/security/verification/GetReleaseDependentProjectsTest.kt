@@ -5,7 +5,7 @@ import io.github.ackeecz.security.testutil.addDependencies
 import io.github.ackeecz.security.testutil.addImplementationDependencies
 import io.github.ackeecz.security.testutil.buildProject
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.inspectors.forAll
+import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import org.gradle.api.Project
@@ -14,7 +14,7 @@ private lateinit var underTest: GetReleaseDependentProjects
 
 internal class GetReleaseDependentProjectsTest : FunSpec({
 
-    beforeEach {
+    beforeTest {
         underTest = GetReleaseDependentProjects()
     }
 
@@ -39,8 +39,8 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
         actual shouldContainProjectsExactlyInAnyOrder listOf(dependentProject1, dependentProject2)
     }
 
-    test("get dependent projects for release configurations") {
-        listOf(
+    context("get dependent projects for release configurations") {
+        withData(
             "api",
             "compileOnly",
             "compileOnlyApi",
@@ -51,7 +51,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
             "releaseImplementation",
             "releaseRuntimeOnly",
             "runtimeOnly",
-        ).forAll { configuration ->
+        ) { configuration ->
             val rootProject = buildProject(name = "root")
             val checkedProject = buildProject(name = "checked", parent = rootProject)
             val notDependentProject = buildProject(name = "not-dependent", parent = rootProject)
@@ -64,8 +64,8 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
         }
     }
 
-    test("get no dependent projects for non-release configurations") {
-        listOf(
+    context("get no dependent projects for non-release configurations") {
+        withData(
             "androidTestApi",
             "androidTestImplementation",
             "debugApi",
@@ -73,7 +73,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
             "testDebugImplementation",
             "testFixturesImplementation",
             "testImplementation",
-        ).forAll { configuration ->
+        ) { configuration ->
             val rootProject = buildProject(name = "root")
             val checkedProject = buildProject(name = "checked", parent = rootProject)
             buildProject(name = "dependent-with-non-release-configuration", parent = rootProject)
