@@ -3,7 +3,7 @@
 If you release for the first time or you forgot the details, long version is recommended, which
 explains the steps in a great detail. Otherwise you can use TLDR version.
 
-## TLDR
+## TLDR version
 
 1. Increase versions of the necessary library artifacts to be released, including the BOM version. 
     You can use `checkIfUpdateNeededSinceCurrentTag` Gradle task to help you figure out what 

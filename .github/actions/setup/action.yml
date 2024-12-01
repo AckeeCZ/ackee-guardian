@@ -1,5 +1,5 @@
 name: Setup
-description: Action that performs common setup tasks like checking out code, etc.
+description: Action that performs common setup tasks like setting up Java
 
 runs:
   using: "composite"

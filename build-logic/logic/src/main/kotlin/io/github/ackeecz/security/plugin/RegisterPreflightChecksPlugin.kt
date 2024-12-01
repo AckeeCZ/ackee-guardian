@@ -31,7 +31,7 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
     private inner class RegisterPreMergeRequestCheck(private val currentProject: Project) {
 
         operator fun invoke() {
-            // Changes to this task must be synchronized with the basic-preflight-check.yml action
+            // Changes to this task must be synchronized with the basic-preflight-check/action.yml action
             // to run the same checks on the CI as well
             currentProject.tasks.register(PRE_MERGE_REQUEST_CHECK_TASK_NAME) {
                 group = Constants.ACKEE_TASKS_GROUP
