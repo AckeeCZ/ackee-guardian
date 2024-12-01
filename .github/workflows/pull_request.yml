@@ -10,5 +10,8 @@ jobs:
   pull_request:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./github/actions/setup
-      - uses: ./github/actions/basic-preflight-check
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/basic-preflight-check

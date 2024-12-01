@@ -4,9 +4,6 @@ description: Action that performs common setup tasks like checking out code, etc
 runs:
   using: "composite"
   steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:

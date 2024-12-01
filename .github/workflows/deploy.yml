@@ -28,7 +28,7 @@ jobs:
         # on published artifacts
         run: |
           ./gradlew publishToMavenLocal
-          ./gradlew artifactsTests
+          ./gradlew :app:testDebugUnitTest
 
   publish:
     needs: preflight_check

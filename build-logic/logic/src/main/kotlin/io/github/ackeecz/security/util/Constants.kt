@@ -13,5 +13,4 @@ public object Constants {
     public val JVM_TARGET: JvmTarget = JvmTarget.JVM_11
 
     public const val ACKEE_TASKS_GROUP: String = "ackee"
-    public const val ARTIFACTS_TESTS_TASK_NAME: String = "artifactsTests"
 }

@@ -10,17 +10,22 @@ runs:
   using: "composite"
   steps:
     - name: Detekt
+      shell: bash
       run: ./gradlew detekt
 
     - name: Assemble release variant
+      shell: bash
       # Exclude sample app module from build. It requires the library artifacts to be published.
       run: ./gradlew assembleRelease -x :app:assembleRelease
 
     - name: Library tests
-      run: ./gradlew testDebugUnitTest
+      shell: bash
+      run: ./gradlew testDebugUnitTest -x :app:testDebugUnitTest
 
     - name: Binary compatibility check
+      shell: bash
       run: ./gradlew apiCheck
 
     - name: Build logic tests
+      shell: bash
       run: ./gradlew build-logic:logic:test

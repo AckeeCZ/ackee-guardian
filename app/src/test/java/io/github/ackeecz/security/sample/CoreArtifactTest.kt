@@ -9,5 +9,6 @@ internal class CoreArtifactTest : AndroidTestWithKeyStore() {
     @Test
     fun `generate master key`() = runTest {
         MasterKey.getOrCreate()
+        throw NotImplementedError()
     }
 }
