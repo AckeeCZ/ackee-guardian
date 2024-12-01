@@ -285,3 +285,5 @@ Developed by [Ackee](https://www.ackee.cz) team with 💙.
 `MasterKey` class from `core` and `EncryptedFile` and `EncryptedSharedPreferences` classes from 
 `jetpack` are based on [Jetpack Security Crypto library](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary)
 published by Google LLC, under the Apache License 2.0.
+
+
