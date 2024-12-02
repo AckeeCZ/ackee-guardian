@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import org.gradle.api.Project
 
 private lateinit var underTest: GetReleaseDependentProjects
 
@@ -35,7 +36,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
         val actual = underTest(checkedProject)
 
         // Assert
-        actual shouldContainExactlyInAnyOrder listOf(dependentProject1, dependentProject2)
+        actual shouldContainProjectsExactlyInAnyOrder listOf(dependentProject1, dependentProject2)
     }
 
     test("get dependent projects for release configurations") {
@@ -59,7 +60,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
 
             val actual = underTest(checkedProject)
 
-            actual shouldContainExactlyInAnyOrder listOf(dependentProject)
+            actual shouldContainProjectsExactlyInAnyOrder listOf(dependentProject)
         }
     }
 
@@ -105,7 +106,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
         val actual = underTest(checkedProject)
 
         // Assert
-        actual shouldContainExactlyInAnyOrder listOf(dependentChildProject, dependentGrandChildProject)
+        actual shouldContainProjectsExactlyInAnyOrder listOf(dependentChildProject, dependentGrandChildProject)
     }
 
     // This is happening for some unit test configurations that they depend on itself, so we need to
@@ -121,3 +122,7 @@ internal class GetReleaseDependentProjectsTest : FunSpec({
         actual.shouldBeEmpty()
     }
 })
+
+private infix fun List<Project>.shouldContainProjectsExactlyInAnyOrder(expected: List<Project>) {
+    map { it.path } shouldContainExactlyInAnyOrder expected.map { it.path }
+}

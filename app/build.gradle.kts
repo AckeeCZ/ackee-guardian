@@ -1,11 +1,11 @@
 import io.github.ackeecz.security.properties.LibraryProperties
+import io.github.ackeecz.security.util.Constants
 
 plugins {
     alias(libs.plugins.ackeecz.security.android.application)
     alias(libs.plugins.ackeecz.security.testing)
     alias(libs.plugins.ackeecz.security.testing.android)
     alias(libs.plugins.ackeecz.security.testing.protobuf)
-    alias(libs.plugins.gradle.testLogger)
 }
 
 private val includeArtifactsTestsProperty = "includeTests"
@@ -26,7 +26,7 @@ android {
                 // on artifacts to be published, so we do not want them to run together with all other
                 // tests using classic Gradle test tasks like testDebugUnitTest. We want to run them
                 // only in a special custom task that sets this property and run this task only under
-                // certain special conditions, like during sanity check on published artifacts to
+                // certain special conditions, like during pre-publish check on published artifacts to
                 // Maven local before real publishing.
                 if (!project.hasProperty(includeArtifactsTestsProperty)) {
                     excludeTestsMatching(artifactsTestsPackage)
@@ -59,8 +59,8 @@ dependencies {
  * Tests published artifacts. This verifies things like correctly published artifacts including BOM
  * or binary compatibility of the dependent artifacts.
  */
-tasks.register("artifactsTests") {
-    group = "verification"
+tasks.register(Constants.ARTIFACTS_TESTS_TASK_NAME) {
+    group = Constants.ACKEE_TASKS_GROUP
     description = "Tests published artifacts of the library"
     ext.set(includeArtifactsTestsProperty, true)
     dependsOn("testDebugUnitTest")

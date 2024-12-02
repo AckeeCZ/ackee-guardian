@@ -22,15 +22,15 @@ private const val NOT_INITIAL_VERSION = "1.0.1"
 
 private const val PROPERTIES_FILE_CONTENT = """
     GROUP_ID=io.github.ackeecz
-    POM_URL=https://github.com/AckeeCZ/ackee-security
+    POM_URL=https://github.com/AckeeCZ/ackee-android-security
     POM_DEVELOPER_ID=ackee
     POM_DEVELOPER_NAME=Ackee
     POM_DEVELOPER_EMAIL=info@ackee.cz
     POM_LICENCE_NAME=The Apache Software License, Version 2.0
     POM_LICENCE_URL=http://www.apache.org/licenses/LICENSE-2.0.txt
-    POM_SCM_CONNECTION=scm:git:github.com/AckeeCZ/ackee-security.git
-    POM_SCM_DEVELOPER_CONNECTION=scm:git:ssh://github.com/AckeeCZ/ackee-security.git
-    POM_SCM_URL=https://github.com/AckeeCZ/ackee-security/tree/main
+    POM_SCM_CONNECTION=scm:git:github.com/AckeeCZ/ackee-android-security.git
+    POM_SCM_DEVELOPER_CONNECTION=scm:git:ssh://github.com/AckeeCZ/ackee-android-security.git
+    POM_SCM_URL=https://github.com/AckeeCZ/ackee-android-security/tree/main
     
     # Core artifact
     CORE_ARTIFACT_ID=security-core

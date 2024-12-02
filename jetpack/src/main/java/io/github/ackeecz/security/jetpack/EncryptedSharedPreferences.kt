@@ -36,7 +36,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.lang.Byte
 import java.lang.ClassCastException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
@@ -569,11 +568,11 @@ private class EncryptedSharedPreferencesImpl(
 
     suspend fun encryptKey(key: PreferenceKey.Decrypted?): PreferenceKey.Encrypted = withContext(defaultDispatcher) {
         throwIfReservedKey(key)
-        val key = key?.value ?: NULL_VALUE
+        val resolvedKey = key?.value ?: NULL_VALUE
         try {
             val keyDeterministicAead = cryptoObjectsHolder.getOrCreate().keyDeterministicAead
             val encryptedKeyBytes = keyDeterministicAead.encryptDeterministically(
-                key.toByteArray(Charsets.UTF_8),
+                resolvedKey.toByteArray(Charsets.UTF_8),
                 fileName.toByteArray(),
             )
             val base64KeyValue = Base64Value(Base64.encode(encryptedKeyBytes))
@@ -597,14 +596,13 @@ private class EncryptedSharedPreferencesImpl(
     }
 
     private fun ByteBuffer.decodeValue(): Any? {
-        return when (val type = decodeEncryptedType()) {
+        return when (decodeEncryptedType()) {
             EncryptedType.STRING -> decodeStringValue()
             EncryptedType.INT -> getInt()
             EncryptedType.LONG -> getLong()
             EncryptedType.FLOAT -> getFloat()
             EncryptedType.BOOLEAN -> get() != 0.toByte()
             EncryptedType.STRING_SET -> decodeStringSet()
-            else -> throw SecurityException("Unhandled type for encrypted pref value: $type")
         }
     }
 
@@ -747,15 +745,17 @@ private class EncryptedSharedPreferencesImpl(
                 .withKeyTemplate(prefKeyEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, KEY_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
-                .build().keysetHandle
+                .build()
+                .keysetHandle
             val aeadKeysetHandle = AndroidKeysetManager.Builder()
                 .withKeyTemplate(prefValueEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, VALUE_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
-                .build().keysetHandle
+                .build()
+                .keysetHandle
 
-            val keyDeterministicAead = daeadKeysetHandle.getPrimitive<DeterministicAead>(DeterministicAead::class.java)
-            val valueAead = aeadKeysetHandle.getPrimitive<Aead>(Aead::class.java)
+            val keyDeterministicAead = daeadKeysetHandle.getPrimitive(DeterministicAead::class.java)
+            val valueAead = aeadKeysetHandle.getPrimitive(Aead::class.java)
 
             return CryptoObjects(keyDeterministicAead, valueAead)
         }
@@ -801,10 +801,10 @@ private class EncryptedSharedPreferencesImpl(
             key: String?,
             values: Set<String?>?,
         ): EncryptedSharedPreferences.Editor {
-            val values = values ?: mutableSetOf<String>().also { it.add(NULL_VALUE) }
-            val byteValues = ArrayList<ByteArray>(values.size)
-            var totalBytes = values.size * Integer.BYTES // Size for each item size
-            values.forEach { value ->
+            val resolvedValues = values ?: mutableSetOf<String>().also { it.add(NULL_VALUE) }
+            val byteValues = ArrayList<ByteArray>(resolvedValues.size)
+            var totalBytes = resolvedValues.size * Integer.BYTES // Size for each item size
+            resolvedValues.forEach { value ->
                 val byteValue = (value ?: NULL_ITEM_VALUE).toByteArray(Charsets.UTF_8)
                 byteValues.add(byteValue)
                 totalBytes += byteValue.size
@@ -845,7 +845,7 @@ private class EncryptedSharedPreferencesImpl(
         }
 
         override suspend fun putBoolean(key: String?, value: Boolean): EncryptedSharedPreferences.Editor {
-            val buffer = ByteBuffer.allocate(Integer.BYTES + Byte.BYTES)
+            val buffer = ByteBuffer.allocate(Integer.BYTES + java.lang.Byte.BYTES)
             buffer.putInt(EncryptedType.BOOLEAN.id)
             buffer.put(if (value) 1.toByte() else 0.toByte())
             putEncryptedObject(key.toDecryptedKey(), buffer.array())
