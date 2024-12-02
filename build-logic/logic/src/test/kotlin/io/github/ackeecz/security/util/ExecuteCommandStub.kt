@@ -2,7 +2,7 @@ package io.github.ackeecz.security.util
 
 import org.gradle.api.Project
 
-internal class StubExecuteCommand : ExecuteCommand {
+internal class ExecuteCommandStub : ExecuteCommand {
 
     private val _commands: MutableList<String> = mutableListOf()
     val commands: List<String> = _commands

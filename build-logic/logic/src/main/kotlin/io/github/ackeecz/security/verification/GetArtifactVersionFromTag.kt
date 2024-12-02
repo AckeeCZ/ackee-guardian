@@ -5,69 +5,67 @@ import io.github.ackeecz.security.util.ExecuteCommand
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.internal.cc.base.logger
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.Properties
 
 /**
- * Returns artifact version of the current [Project] from the last release tag.
+ * Returns artifact version of the current [Project] from the passed release tag.
  * [Project] needs to be publishable in order for this logic to succeed. If the returned version is
  * null, it means that the version does not exist, because the artifact was not released yet.
  */
-internal interface GetArtifactVersionFromLastTag {
+internal interface GetArtifactVersionFromTag {
 
-    operator fun invoke(project: Project): ArtifactVersion?
+    operator fun invoke(project: Project, tagResult: TagResult): ArtifactVersion?
 
     companion object {
 
-        operator fun invoke(): GetArtifactVersionFromLastTag {
-            return GetArtifactVersionFromLastTagImpl(
-                getLastTag = GetLastTag(),
-                executeCommand = ExecuteCommand(),
-            )
+        operator fun invoke(): GetArtifactVersionFromTag {
+            return GetArtifactVersionFromTagImpl(executeCommand = ExecuteCommand())
         }
     }
 }
 
-internal class GetArtifactVersionFromLastTagImpl(
-    private val getLastTag: GetLastTag,
+@VisibleForTesting
+internal class GetArtifactVersionFromTagImpl(
     private val executeCommand: ExecuteCommand,
-) : GetArtifactVersionFromLastTag {
+) : GetArtifactVersionFromTag {
 
-    override fun invoke(project: Project): ArtifactVersion? {
-        return Impl(project).invoke()
+    override fun invoke(project: Project, tagResult: TagResult): ArtifactVersion? {
+        return Impl(project).invoke(tagResult)
     }
 
     private inner class Impl(private val project: Project) {
 
-        fun invoke(): ArtifactVersion? {
-            return when (val lastTagResult = getLastTag(project)) {
-                is LastTagResult.Tag -> getVersionFromLastTag(lastTagResult)
-                is LastTagResult.FirstCommitHash -> handleFirstCommitHashResult()
+        fun invoke(tagResult: TagResult): ArtifactVersion? {
+            return when (tagResult) {
+                is TagResult.Tag -> getVersionFromTag(tagResult)
+                is TagResult.FirstCommitHash -> handleFirstCommitHashResult()
             }
         }
 
-        private fun getVersionFromLastTag(lastTagResult: LastTagResult.Tag): ArtifactVersion? {
-            val propertiesResult = executeCommand("git show ${lastTagResult.value}:$PROPERTIES_FILE_NAME", project)
-            when (propertiesResult) {
-                is ExecuteCommand.Result.Success -> return parseVersionFromProperties(propertiesResult, lastTagResult)
-                is ExecuteCommand.Result.Error -> throw LastTagPropertiesException(project, lastTagResult)
+        private fun getVersionFromTag(tagResult: TagResult.Tag): ArtifactVersion? {
+            val command = "git show ${tagResult.value}:$PROPERTIES_FILE_NAME"
+            when (val propertiesResult = executeCommand(command, project)) {
+                is ExecuteCommand.Result.Success -> return parseVersionFromProperties(propertiesResult, tagResult)
+                is ExecuteCommand.Result.Error -> throw TagPropertiesException(project, tagResult)
             }
         }
 
         private fun parseVersionFromProperties(
             propertiesResult: ExecuteCommand.Result.Success,
-            lastTagResult: LastTagResult.Tag,
+            tagResult: TagResult.Tag,
         ): ArtifactVersion? {
             val propertiesContent = propertiesResult.commandOutput
-            logger.info("Loading properties file content from the tag ${lastTagResult.value}:\n$propertiesContent")
+            logger.info("Loading properties file content from the tag ${tagResult.value}:\n$propertiesContent")
             val properties = Properties().also { it.load(propertiesResult.commandOutput.byteInputStream()) }
             return try {
-                val lastTagVersion = LibraryProperties(properties, project).getArtifactProperties().version
-                ArtifactVersion(lastTagVersion)
+                val version = LibraryProperties(properties, project).getArtifactProperties().version
+                ArtifactVersion(version)
             } catch (e: IllegalArgumentException) {
                 if (project.version.toString() == INITIAL_LIBRARY_VERSION) {
                     return null
                 } else {
-                    throw VersionUnparseableException(project, e)
+                    throw VersionUnparseableException(project, tagResult, e)
                 }
             }
         }
@@ -94,18 +92,20 @@ internal value class ArtifactVersion(val value: String)
 
 internal class VersionUnparseableException(
     project: Project,
+    tag: TagResult.Tag,
     override val cause: Throwable?,
 ) : GradleException() {
 
-    override val message = "Version of the artifact of the project ${project.name} could not have been parsed from the last tag"
+    override val message = "Version of the artifact of the project ${project.name} could not have " +
+        "been parsed from the tag ${tag.value}"
 }
 
-internal class LastTagPropertiesException(
+internal class TagPropertiesException(
     project: Project,
-    lastTag: LastTagResult.Tag,
+    tag: TagResult.Tag,
 ) : GradleException() {
 
-    override val message = "Getting properties of last tag ${lastTag.value} failed for the project ${project.name}"
+    override val message = "Getting properties of the tag ${tag.value} failed for the project ${project.name}"
 }
 
 internal class UnexpectedInitialVersionException(

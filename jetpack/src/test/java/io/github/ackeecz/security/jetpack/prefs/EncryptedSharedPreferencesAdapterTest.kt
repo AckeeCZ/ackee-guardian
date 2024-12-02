@@ -6,7 +6,7 @@ import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import io.github.ackeecz.security.core.MasterKey
 import io.github.ackeecz.security.core.internal.AndroidTestWithKeyStore
-import io.github.ackeecz.security.core.internal.FakeWeakReferenceFactory
+import io.github.ackeecz.security.core.internal.WeakReferenceFactoryFake
 import io.github.ackeecz.security.core.internal.junit.rule.CoroutineRule
 import io.github.ackeecz.security.jetpack.EncryptedSharedPreferences
 import io.github.ackeecz.security.jetpack.EncryptedSharedPreferencesAdapter
@@ -29,7 +29,7 @@ internal class EncryptedSharedPreferencesAdapterTest : AndroidTestWithKeyStore()
 
     private val context: Context get() = ApplicationProvider.getApplicationContext()
 
-    private val weakReferenceFactory = FakeWeakReferenceFactory()
+    private val weakReferenceFactory = WeakReferenceFactoryFake()
 
     private lateinit var underTest: EncryptedSharedPreferencesAdapter
 

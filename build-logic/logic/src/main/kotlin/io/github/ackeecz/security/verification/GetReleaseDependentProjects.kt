@@ -59,6 +59,6 @@ private class GetReleaseDependentProjectsImpl : GetReleaseDependentProjects {
             "runtimeOnly",
         )
 
-        private val RELEASE_CONFIGURATION_PREFIX = "release"
+        private const val RELEASE_CONFIGURATION_PREFIX = "release"
     }
 }

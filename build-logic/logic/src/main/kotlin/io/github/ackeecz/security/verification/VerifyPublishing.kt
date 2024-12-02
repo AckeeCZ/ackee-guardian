@@ -2,27 +2,35 @@ package io.github.ackeecz.security.verification
 
 import io.github.ackeecz.security.util.PublishableProject
 import org.gradle.api.Project
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
  * Verifies that all dependencies between [Project] being checked and its dependent artifacts are
  * compatible and can be safely published. This includes checking if current project
  * changed and increased its version, if it has dependent modules. At the same time it checks if
- * the dependent modules increased their versions as well, so everything is probably updated once
+ * the dependent modules increased their versions as well, so everything is properly updated once
  * released and there are no incompatible dependencies in upcoming published artifacts. This is
  * especially important for internal modules that do not have stable API, can contain breaking
  * changes and for example if they were released without all dependent artifacts being updated and
  * released as well, this could break compatibility for the library client at runtime, because there
  * could be a newer version of the internal artifact and older versions of all or some of the dependent
  * ones, causing runtime inconsistencies and crashes.
+ *
+ * Uses tag retrieved from [GetPreviousTag], because this task is mainly meant to be run on CI
+ * during publishing process to verify publishing and it is needed to check the previous version
+ * tag, because the current one (the latest) is the one that triggered the current process of releasing
+ * a new version.
  */
-internal class VerifyPublishing(
-    private val getArtifactVersionFromLastTag: GetArtifactVersionFromLastTag,
+internal class VerifyPublishing @VisibleForTesting constructor(
+    private val getPreviousTag: GetPreviousTag,
+    private val getArtifactVersionFromTag: GetArtifactVersionFromTag,
     private val getReleaseDependentProjects: GetReleaseDependentProjects,
     private val checkArtifactUpdateStatus: CheckArtifactUpdateStatus,
 ) {
 
     constructor() : this(
-        getArtifactVersionFromLastTag = GetArtifactVersionFromLastTag(),
+        getPreviousTag = GetPreviousTag(),
+        getArtifactVersionFromTag = GetArtifactVersionFromTag(),
         getReleaseDependentProjects = GetReleaseDependentProjects(),
         checkArtifactUpdateStatus = CheckArtifactUpdateStatus(),
     )
@@ -50,6 +58,8 @@ internal class VerifyPublishing(
         private val dependentProjects: List<Project>,
     ) {
 
+        private val previousTagResult = getPreviousTag(project)
+
         operator fun invoke(): Result {
             return if (project.isVersionSameSinceLastRelease()) {
                 handleNotChangedVersion()
@@ -59,11 +69,11 @@ internal class VerifyPublishing(
         }
 
         private fun Project.isVersionSameSinceLastRelease(): Boolean {
-            return getArtifactVersionFromLastTag(project)?.value == project.version.toString()
+            return getArtifactVersionFromTag(project, previousTagResult)?.value == project.version.toString()
         }
 
         private fun handleNotChangedVersion(): Result {
-            return when (checkArtifactUpdateStatus(project)) {
+            return when (checkArtifactUpdateStatus(project, previousTagResult)) {
                 ArtifactUpdateStatus.UP_TO_DATE -> Result.Success
                 ArtifactUpdateStatus.UPDATE_NEEDED -> handleNeededUpdate()
             }

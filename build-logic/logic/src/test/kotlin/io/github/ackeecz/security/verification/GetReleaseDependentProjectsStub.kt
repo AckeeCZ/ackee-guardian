@@ -2,7 +2,7 @@ package io.github.ackeecz.security.verification
 
 import org.gradle.api.Project
 
-internal class StubGetReleaseDependentProjects : GetReleaseDependentProjects {
+internal class GetReleaseDependentProjectsStub : GetReleaseDependentProjects {
 
     var dependentProjects: List<Project> = emptyList()
 

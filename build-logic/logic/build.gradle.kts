@@ -69,6 +69,11 @@ gradlePlugin {
             dependency = libs.plugins.ackeecz.security.testing.protobuf,
             pluginClassSimpleName = "TestingProtobufPlugin",
         )
+
+        plugin(
+            dependency = libs.plugins.ackeecz.security.tink,
+            pluginClassSimpleName = "TinkPlugin",
+        )
     }
 }
 

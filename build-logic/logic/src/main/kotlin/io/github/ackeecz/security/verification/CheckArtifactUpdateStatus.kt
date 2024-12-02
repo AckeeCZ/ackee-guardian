@@ -3,36 +3,36 @@ package io.github.ackeecz.security.verification
 import io.github.ackeecz.security.util.ExecuteCommand
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
- * Checks if the artifact has changed and needs to be updated (new version released) or
- * if it is up-to-date and update is not necessary.
+ * Checks if the artifact has changed since the version specified by the passed [TagResult] and
+ * needs to be updated (new version released) or if it is up-to-date and update is not necessary.
  */
 internal interface CheckArtifactUpdateStatus {
 
-    operator fun invoke(project: Project): ArtifactUpdateStatus
+    operator fun invoke(project: Project, tagResult: TagResult): ArtifactUpdateStatus
 
     companion object {
 
         operator fun invoke(): CheckArtifactUpdateStatus {
-            return CheckArtifactUpdateStatusImpl(
-                getLastTag = GetLastTag(),
-                executeCommand = ExecuteCommand(),
-            )
+            return CheckArtifactUpdateStatusImpl(executeCommand = ExecuteCommand())
         }
     }
 }
 
+@VisibleForTesting
 internal class CheckArtifactUpdateStatusImpl(
-    private val getLastTag: GetLastTag,
     private val executeCommand: ExecuteCommand,
 ) : CheckArtifactUpdateStatus {
 
-    override operator fun invoke(project: Project): ArtifactUpdateStatus {
+    override operator fun invoke(
+        project: Project,
+        tagResult: TagResult,
+    ): ArtifactUpdateStatus {
         val dirPathToCheck = project.file(SRC_MAIN_DIR).absolutePath
-        val tagOrCommitHash = getLastTag(project).value
-        val diffResult = executeCommand("git diff $tagOrCommitHash -- $dirPathToCheck", project)
-        return when (diffResult) {
+        val command = "git diff ${tagResult.value} -- $dirPathToCheck"
+        return when (val diffResult = executeCommand(command, project)) {
             is ExecuteCommand.Result.Success -> {
                 if (diffResult.commandOutput.isBlank()) {
                     ArtifactUpdateStatus.UP_TO_DATE
