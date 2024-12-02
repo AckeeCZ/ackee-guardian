@@ -2,6 +2,7 @@ package io.github.ackeecz.security.plugin
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
+import io.github.ackeecz.security.ProjectNames
 import io.github.ackeecz.security.properties.LibraryProperties
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -62,6 +63,12 @@ internal class PublishingPlugin : Plugin<Project> {
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
         }
 
+        excludeTestFixturesFromPublishing()
+    }
+}
+
+private fun Project.excludeTestFixturesFromPublishing() {
+    if (project.name != ProjectNames.BOM_MODULE_NAME) {
         // TODO Using afterEvaluate seems hacky, but even when using AGP DSL like onVariants, the
         //  component is not available yet and I don't know how to do it better for now
         afterEvaluate {
@@ -72,8 +79,13 @@ internal class PublishingPlugin : Plugin<Project> {
                 //  I didn't figure it out.
                 val componentName = "release"
                 val component = project.components.getByName(componentName) as AdhocComponentWithVariants
-                component.withVariantsFromConfiguration(configurations.getByName("${componentName}TestFixturesVariantReleaseApiPublication")) { skip() }
-                component.withVariantsFromConfiguration(configurations.getByName("${componentName}TestFixturesVariantReleaseRuntimePublication")) { skip() }
+                val configurationNames = listOf(
+                    "${componentName}TestFixturesVariantReleaseApiPublication",
+                    "${componentName}TestFixturesVariantReleaseRuntimePublication"
+                )
+                configurationNames.forEach { configName ->
+                    component.withVariantsFromConfiguration(configurations.getByName(configName)) { skip() }
+                }
             } catch (_: UnknownConfigurationException) {
                 // Thrown when the current Project does not support test fixtures, so it does not contain
                 // configurations above

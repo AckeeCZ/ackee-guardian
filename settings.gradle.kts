@@ -28,6 +28,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "ackee-security"
 
 include(":app")
+include(":bom")
 include(":core")
 include(":core-internal")
 include(":datastore")
