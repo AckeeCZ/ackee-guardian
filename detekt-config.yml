@@ -1,0 +1,38 @@
+comments:
+  AbsentOrWrongFileLicense:
+    active: false
+
+complexity:
+  TooManyFunctions:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+
+formatting:
+  ArgumentListWrapping:
+    maxLineLength: 150
+    excludes: [ "**Test.kt" ]
+  ContextReceiverMapping:
+    maxLineLength: 150
+  FunctionReturnTypeSpacing:
+    maxLineLength: 150
+  FunctionSignature:
+    maxLineLength: 150
+  MaximumLineLength:
+    maxLineLength: 150
+  ParameterListSpacing:
+    maxLineLength: 150
+  ParameterListWrapping:
+    maxLineLength: 150
+  ParameterWrapping:
+    maxLineLength: 150
+  PropertyWrapping:
+    maxLineLength: 150
+  Wrapping:
+    maxLineLength: 150
+
+style:
+  MaxLineLength:
+    maxLineLength: 150
