@@ -2,7 +2,6 @@ package io.github.ackeecz.security.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import java.io.ByteArrayOutputStream
 
 internal class AndroidLibraryPlugin : Plugin<Project> {
 
@@ -18,8 +17,8 @@ internal class AndroidLibraryPlugin : Plugin<Project> {
     }
 
     private fun Project.configure() {
-        pluginManager.apply(libs.findPlugin("android.library"))
-        pluginManager.apply(libs.findPlugin("kotlin.android"))
+        pluginManager.apply(libs.plugins.android.library)
+        pluginManager.apply(libs.plugins.kotlin.android)
 
         androidLibrary {
             defaultConfig {

@@ -1,6 +1,6 @@
 plugins {
     `java-platform`
-    id("ackee.security.publishing")
+    alias(libs.plugins.ackeecz.security.publishing)
 }
 
 dependencies {

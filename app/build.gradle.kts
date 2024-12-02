@@ -1,5 +1,5 @@
 plugins {
-    id("ackee.security.android.application")
+    alias(libs.plugins.ackeecz.security.android.application)
 }
 
 android {

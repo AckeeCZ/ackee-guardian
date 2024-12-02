@@ -22,8 +22,8 @@ internal class PublishingPlugin : Plugin<Project> {
 
     private fun Project.configure() {
         // com.vanniktech.maven.publish plugin can detect and use applied Dokka plugin automatically
-        pluginManager.apply(libs.findPlugin("dokka"))
-        pluginManager.apply(libs.findPlugin("mavenPublish"))
+        pluginManager.apply(libs.plugins.dokka)
+        pluginManager.apply(libs.plugins.mavenPublish)
 
         val libraryProperties = LibraryProperties(project)
         val artifactProperties = libraryProperties.getArtifactProperties()

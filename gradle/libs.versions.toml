@@ -66,3 +66,11 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }
+
+# Contention plugins defined by this project
+ackeecz-security-android-application = { id = "ackeecz.security.android.application" }
+ackeecz-security-android-library = { id = "ackeecz.security.android.library" }
+ackeecz-security-publishing = { id = "ackeecz.security.publishing" }
+ackeecz-security-testfixtures = { id = "ackeecz.security.testfixtures" }
+ackeecz-security-testing = { id = "ackeecz.security.testing" }
+ackeecz-security-testing-android = { id = "ackeecz.security.testing.android" }

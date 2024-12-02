@@ -19,6 +19,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    compileOnly(files(libs::class.java.superclass.protectionDomain.codeSource.location))
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.detekt.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
@@ -33,37 +34,45 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        val basePluginId = "ackee.security"
-        val pluginPackage = "io.github.ackeecz.security.plugin"
+        plugin(
+            dependency = libs.plugins.ackeecz.security.android.application,
+            pluginClassSimpleName = "AndroidApplicationPlugin",
+        )
 
-        register("android-application") {
-            id = "$basePluginId.android.application"
-            implementationClass = "$pluginPackage.AndroidApplicationPlugin"
-        }
+        plugin(
+            dependency = libs.plugins.ackeecz.security.android.library,
+            pluginClassSimpleName = "AndroidLibraryPlugin",
+        )
 
-        register("android-library") {
-            id = "$basePluginId.android.library"
-            implementationClass = "$pluginPackage.AndroidLibraryPlugin"
-        }
+        plugin(
+            dependency = libs.plugins.ackeecz.security.publishing,
+            pluginClassSimpleName = "PublishingPlugin",
+        )
 
-        register("publishing") {
-            id = "$basePluginId.publishing"
-            implementationClass = "$pluginPackage.PublishingPlugin"
-        }
+        plugin(
+            dependency = libs.plugins.ackeecz.security.testfixtures,
+            pluginClassSimpleName = "TestFixturesPlugin",
+        )
 
-        register("test-fixtures") {
-            id = "$basePluginId.testfixtures"
-            implementationClass = "$pluginPackage.TestFixturesPlugin"
-        }
+        plugin(
+            dependency = libs.plugins.ackeecz.security.testing.asProvider(),
+            pluginClassSimpleName = "TestingPlugin",
+        )
 
-        register("testing") {
-            id = "$basePluginId.testing"
-            implementationClass = "$pluginPackage.TestingPlugin"
-        }
+        plugin(
+            dependency = libs.plugins.ackeecz.security.testing.android,
+            pluginClassSimpleName = "TestingAndroidPlugin",
+        )
+    }
+}
 
-        register("testing-android") {
-            id = "$basePluginId.testing.android"
-            implementationClass = "$pluginPackage.TestingAndroidPlugin"
-        }
+private fun NamedDomainObjectContainer<PluginDeclaration>.plugin(
+    dependency: Provider<out PluginDependency>,
+    pluginClassSimpleName: String,
+) {
+    val pluginId = dependency.get().pluginId
+    register(pluginId) {
+        id = pluginId
+        implementationClass = "io.github.ackeecz.security.plugin.$pluginClassSimpleName"
     }
 }

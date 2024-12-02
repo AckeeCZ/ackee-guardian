@@ -31,9 +31,9 @@ internal class TestingAndroidPlugin : Plugin<Project> {
     private fun Project.applyDependencies() {
         dependencies {
 
-            testImplementation(libs.findLibrary("androidx.test.junitKtx"))
-            testImplementation(libs.findLibrary("junit4"))
-            testImplementation(libs.findLibrary("robolectric"))
+            testImplementation(libs.androidx.test.junitKtx)
+            testImplementation(libs.junit4)
+            testImplementation(libs.robolectric)
         }
     }
 }

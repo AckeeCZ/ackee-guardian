@@ -18,8 +18,8 @@ internal class AndroidApplicationPlugin : Plugin<Project> {
     }
 
     private fun Project.configure() {
-        pluginManager.apply(libs.findPlugin("android.application"))
-        pluginManager.apply(libs.findPlugin("kotlin.android"))
+        pluginManager.apply(libs.plugins.android.application)
+        pluginManager.apply(libs.plugins.kotlin.android)
 
         androidApp {
             compileSdk = Constants.COMPILE_SDK
