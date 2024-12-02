@@ -37,15 +37,6 @@ import java.io.OutputStream
 import java.nio.channels.FileChannel
 import java.security.GeneralSecurityException
 
-// TODO Consider adding new functionality for renaming file, since classic file renaming fails decryption
-//  process, because file name is used as associated data.
-// TODO Consider adding some new functionality for modifying the file with already existing content
-// TODO Probably expose isUsingKeystore method to be able to detect/track it and document this to
-//  build method docs as well, since it now contains information about the possibility of not encrypting
-//  keyset.
-// TODO Maybe exclude default prefs file with stored keysets from autobackup automatically as part of
-//  the library, so it is protected from unnecessary backup and possible autobackup exploiting, which
-//  was possible on some Android version(s).
 /**
  * Class used to create and read encrypted files.
  *
@@ -65,7 +56,12 @@ import java.security.GeneralSecurityException
  * ```
  * val getMasterKey = suspend { MasterKey.getOrCreate() }
  * val file = File(context.filesDir, "secret_data")
- * val encryptedFile = EncryptedFile.Builder(context, file, getMasterKey).build()
+ * val encryptedFile = EncryptedFile.Builder(
+ *     context = context,
+ *     file = file,
+ *     encryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
+ *     getMasterKey = getMasterKey,
+ * ).build()
  * // Write to the encrypted file
  * val encryptedOutputStream = encryptedFile.openFileOutput()
  * // Read the encrypted file
@@ -124,11 +120,6 @@ public class EncryptedFile private constructor(private val builder: Builder) {
 
     private inner class StreamingAeadHolder : SynchronizedDataHolder<StreamingAead>(builder.backgroundDispatcher) {
 
-        // TODO StreamingAead/AndroidKeysetManager should be created just once per process and
-        //  not for every usage. We could cache StreamingAeads for specific keysets (so for
-        //  specific combination of keysetAlias + keysetPrefsFileName) to optimize this without
-        //  a client to know about the details. If this was somehow problematic, we could at least
-        //  inform a client about this in the contract of this method/class.
         override suspend fun createSynchronizedData(): StreamingAead {
             StreamingAeadConfig.register()
             return AndroidKeysetManager.Builder()
@@ -243,7 +234,9 @@ public class EncryptedFile private constructor(private val builder: Builder) {
         }
 
         /**
-         * @param keysetAlias The alias in the SharedPreferences file to store the keyset.
+         * @param keysetAlias The alias in the SharedPreferences file to store the keyset. The
+         * keyset holds the data encryption key that is used to encrypt/decrypt the file.
+         *
          * @return This Builder
          */
         public fun setKeysetAlias(keysetAlias: String): Builder {

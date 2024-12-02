@@ -30,6 +30,7 @@ android {
                 // Maven local before real publishing.
                 if (!project.hasProperty(includeArtifactsTestsProperty)) {
                     excludeTestsMatching(artifactsTestsPackage)
+                    isFailOnNoMatchingTests = false
                 }
             }
         }

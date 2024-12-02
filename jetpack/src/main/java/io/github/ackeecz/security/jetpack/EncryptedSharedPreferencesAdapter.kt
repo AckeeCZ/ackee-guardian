@@ -143,6 +143,7 @@ private const val DEPRECATION_MESSAGE = "Using this adapter is highly discourage
  * - if you need to pass [EncryptedSharedPreferences] to the code you can't change
  * (such as third-party library) and it requires [SharedPreferences] interface
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated(message = DEPRECATION_MESSAGE)
 public fun EncryptedSharedPreferences.adaptToSharedPreferences(): SharedPreferences {
     return EncryptedSharedPreferencesAdapter(this)

@@ -12,8 +12,6 @@ import org.gradle.api.artifacts.UnknownConfigurationException
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.kotlin.dsl.configure
 
-// TODO Provide signing secrets and ossrh username and password on CI using env variables
-// TODO Explore binary compatibility validator
 internal class PublishingPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {

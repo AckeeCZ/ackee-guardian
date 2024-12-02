@@ -15,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlin.properties.ReadOnlyProperty
 
-// TODO Validate "example usage" in docs before library release when public interface is finalized
 /**
  * Creates a property delegate for an encrypted single process preferences [DataStore]. This should
  * only be called once in a file (at the top level), and all usages of the [DataStore] should use a

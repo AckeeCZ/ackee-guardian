@@ -16,11 +16,12 @@ dependencies {
     implementation(projects.coreInternal)
 
     implementation(libs.androidx.annotation)
-    implementation(libs.androidx.collectionKtx)
+    implementation(libs.androidx.collection)
 
     implementation(platform(libs.coroutines.bom))
     implementation(libs.coroutines.android)
 
     testImplementation(testFixtures(projects.coreInternal))
     testImplementation(libs.androidx.coreKtx)
+    testImplementation(libs.tink.android)
 }

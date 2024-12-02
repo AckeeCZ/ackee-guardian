@@ -7,6 +7,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.dataStoreFile
 import io.github.ackeecz.security.datastore.core.DataStoreCryptoParams
 import io.github.ackeecz.security.datastore.core.internal.EncryptingSerializer
 import kotlinx.coroutines.CoroutineScope
@@ -14,10 +15,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.io.File
 
-// TODO Document that clients can use Context.dataStoreFile method to produce a file
 /**
  * Creates an instance of encrypted [DataStore]. Never create more than one instance of
- * DataStore for a given file; doing so can break all DataStore functionality. You should
+ * DataStore for a given file. Doing so can break all DataStore functionality. You should
  * consider managing your DataStore instance as a singleton.
  *
  * @param context Context of the application. It is safe to pass an Activity context, but best
@@ -33,7 +33,8 @@ import java.io.File
  * @param scope The scope in which IO operations and transform functions will execute.
  * @param produceFile Function which returns the file that the new DataStore will act on.
  * The function must return the same file every time. No two instances of DataStore
- * should act on the same file at the same time. File will be created if it doesn't exist.
+ * should act on the same file at the same time. File will be created if it doesn't exist. You can
+ * use [Context.dataStoreFile] helper method to create a DataStore file in a standard location.
  *
  * @return a new encrypted DataStore instance with the provided configuration
  */

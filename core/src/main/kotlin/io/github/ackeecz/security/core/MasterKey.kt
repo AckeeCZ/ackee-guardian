@@ -25,9 +25,22 @@ private val keyMutex = Mutex()
  * by using [createSafeDefaultSpecBuilder] method for getting a [KeyGenParameterSpec.Builder]
  * configured with safe default parameters.
  */
-public data class MasterKey private constructor(public val alias: String) {
+public class MasterKey private constructor(public val alias: String) {
 
     public val keyStoreUri: String = "$KEYSTORE_URI_SCHEME$alias"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MasterKey
+
+        return alias == other.alias
+    }
+
+    override fun hashCode(): Int {
+        return alias.hashCode()
+    }
 
     public companion object {
 

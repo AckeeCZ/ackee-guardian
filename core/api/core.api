@@ -1,0 +1,16 @@
+public final class io/github/ackeecz/security/core/MasterKey {
+	public static final field Companion Lio/github/ackeecz/security/core/MasterKey$Companion;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAlias ()Ljava/lang/String;
+	public final fun getKeyStoreUri ()Ljava/lang/String;
+	public fun hashCode ()I
+}
+
+public final class io/github/ackeecz/security/core/MasterKey$Companion {
+	public final fun createSafeDefaultSpecBuilder (Ljava/lang/String;)Landroid/security/keystore/KeyGenParameterSpec$Builder;
+	public static synthetic fun createSafeDefaultSpecBuilder$default (Lio/github/ackeecz/security/core/MasterKey$Companion;Ljava/lang/String;ILjava/lang/Object;)Landroid/security/keystore/KeyGenParameterSpec$Builder;
+	public final fun getOrCreate (Landroid/security/keystore/KeyGenParameterSpec;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun getOrCreate$default (Lio/github/ackeecz/security/core/MasterKey$Companion;Landroid/security/keystore/KeyGenParameterSpec;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
