@@ -1,5 +1,6 @@
 package io.github.ackeecz.security.properties
 
+import io.github.ackeecz.security.util.PublishableProject
 import org.gradle.api.Project
 import java.io.File
 import java.util.Properties
@@ -22,6 +23,12 @@ public class LibraryProperties internal constructor(
     public val pomScmConnection: String = getProperty("POM_SCM_CONNECTION")
     public val pomScmDeveloperConnection: String = getProperty("POM_SCM_DEVELOPER_CONNECTION")
     public val pomScmUrl: String = getProperty("POM_SCM_URL")
+
+    public val bomArtifactProperties: ArtifactProperties
+        get() = ArtifactProperties.getFor(
+            projectName = PublishableProject.Bom.projectName,
+            properties = properties,
+        )
 
     public constructor(project: Project) : this(
         properties = Properties().also {

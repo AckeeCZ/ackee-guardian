@@ -15,6 +15,6 @@ dependencies {
     implementation(platform(libs.coroutines.bom))
     implementation(libs.coroutines.android)
 
-    // TODO Add min version constraint for clients to use
-    compileOnly(libs.tink.android)
+    // TODO Change to compileOnly and add min version constraint for clients to use
+    implementation(libs.tink.android)
 }

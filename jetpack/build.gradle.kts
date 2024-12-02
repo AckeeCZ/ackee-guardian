@@ -11,8 +11,7 @@ android {
 
 dependencies {
 
-    // TODO This will need to by probably API to expose it to clients as well
-    implementation(projects.core)
+    api(projects.core)
     implementation(projects.coreInternal)
 
     implementation(libs.androidx.annotation)

@@ -9,6 +9,7 @@ agp = "8.7.2"
 bouncyCastle = "1.78.1"
 detekt = "1.23.7"
 dokka = "1.9.20"
+gradle-testLogger = "4.0.0"
 junit4 = "4.13.2"
 junit5-bom = "5.11.0"
 kotlin = "2.0.21"
@@ -57,12 +58,14 @@ android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref 
 detekt-gradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 mavenPublish-gradlePlugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
+protobuf-gradlePlugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version.ref = "protobuf-gradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+gradle-testLogger = { id = "com.adarshr.test-logger", version.ref = "gradle-testLogger" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }
@@ -74,3 +77,4 @@ ackeecz-security-publishing = { id = "ackeecz.security.publishing" }
 ackeecz-security-testfixtures = { id = "ackeecz.security.testfixtures" }
 ackeecz-security-testing = { id = "ackeecz.security.testing" }
 ackeecz-security-testing-android = { id = "ackeecz.security.testing.android" }
+ackeecz-security-testing-protobuf = { id = "ackeecz.security.testing.protobuf" }

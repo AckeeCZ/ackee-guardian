@@ -24,7 +24,7 @@ internal abstract class EncryptedTypedDataStoreTest : EncryptedDataStoreTest<Tes
     }
 
     override suspend fun updateData(currentData: TestData): TestData {
-        return currentData.copy { first = first + 1 }
+        return currentData.copy { first += 1 }
     }
 
     override fun createExpectedData(): TestData {
