@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.mavenPublish) apply false
+    alias(libs.plugins.protobuf) apply false
 }

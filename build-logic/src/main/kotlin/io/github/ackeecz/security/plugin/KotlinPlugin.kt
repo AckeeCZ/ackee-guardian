@@ -18,6 +18,7 @@ internal class KotlinPlugin : Plugin<Project> {
                 jvmTarget.set(Constants.JVM_TARGET)
                 allWarningsAsErrors.set(true)
                 freeCompilerArgs.addAll(
+                    "-opt-in=kotlin.ExperimentalStdlibApi",
                     "-opt-in=kotlin.RequiresOptIn",
                     "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                     "-Xexplicit-api=strict",

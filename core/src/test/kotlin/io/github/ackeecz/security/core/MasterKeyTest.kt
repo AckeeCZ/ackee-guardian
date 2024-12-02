@@ -2,7 +2,8 @@ package io.github.ackeecz.security.core
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import io.github.ackeecz.security.core.junit.rule.CoroutineRule
+import io.github.ackeecz.security.core.internal.AndroidTestWithKeyStore
+import io.github.ackeecz.security.core.internal.junit.rule.CoroutineRule
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
