@@ -1,0 +1,16 @@
+name: Main branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/basic-preflight-check

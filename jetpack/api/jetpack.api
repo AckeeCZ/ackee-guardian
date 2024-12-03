@@ -5,7 +5,7 @@ public final class io/github/ackeecz/security/jetpack/EncryptedFile {
 }
 
 public final class io/github/ackeecz/security/jetpack/EncryptedFile$Builder {
-	public fun <init> (Landroid/content/Context;Ljava/io/File;Lio/github/ackeecz/security/jetpack/EncryptedFile$FileEncryptionScheme;Lkotlin/jvm/functions/Function1;)V
+	public fun <init> (Ljava/io/File;Landroid/content/Context;Lio/github/ackeecz/security/jetpack/EncryptedFile$FileEncryptionScheme;Lkotlin/jvm/functions/Function1;)V
 	public final fun build ()Lio/github/ackeecz/security/jetpack/EncryptedFile;
 	public final fun setBackgroundDispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/ackeecz/security/jetpack/EncryptedFile$Builder;
 	public final fun setKeysetAlias (Ljava/lang/String;)Lio/github/ackeecz/security/jetpack/EncryptedFile$Builder;
@@ -38,7 +38,7 @@ public abstract interface class io/github/ackeecz/security/jetpack/EncryptedShar
 }
 
 public final class io/github/ackeecz/security/jetpack/EncryptedSharedPreferences$Companion {
-	public final fun create (Landroid/content/Context;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences$PrefValueEncryptionScheme;)Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences;
+	public final fun create (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Landroid/content/Context;Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences$PrefValueEncryptionScheme;)Lio/github/ackeecz/security/jetpack/EncryptedSharedPreferences;
 }
 
 public final class io/github/ackeecz/security/jetpack/EncryptedSharedPreferences$DefaultImpls {

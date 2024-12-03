@@ -1,4 +1,3 @@
-// TODO Should this licence be here and for other JetSec original files?
 /*
  * Copyright 2018 The Android Open Source Project
  *
@@ -13,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This file is based on the original EncryptedFile from Jetpack Security Crypto library
+ * https://developer.android.com/reference/kotlin/androidx/security/crypto/EncryptedFile
  */
 package io.github.ackeecz.security.jetpack
 
@@ -57,8 +59,8 @@ import java.security.GeneralSecurityException
  * val getMasterKey = suspend { MasterKey.getOrCreate() }
  * val file = File(context.filesDir, "secret_data")
  * val encryptedFile = EncryptedFile.Builder(
- *     context = context,
  *     file = file,
+ *     context = context,
  *     encryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
  *     getMasterKey = getMasterKey,
  * ).build()
@@ -213,8 +215,8 @@ public class EncryptedFile private constructor(private val builder: Builder) {
     }
 
     public class Builder public constructor(
-        context: Context,
         internal val file: File,
+        context: Context,
         internal val encryptionScheme: FileEncryptionScheme,
         internal val getMasterKey: suspend () -> MasterKey,
     ) {

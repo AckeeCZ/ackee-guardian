@@ -31,6 +31,8 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
     private inner class RegisterPreMergeRequestCheck(private val currentProject: Project) {
 
         operator fun invoke() {
+            // Changes to this task must be synchronized with the basic-preflight-check/action.yml action
+            // to run the same checks on the CI as well
             currentProject.tasks.register(PRE_MERGE_REQUEST_CHECK_TASK_NAME) {
                 group = Constants.ACKEE_TASKS_GROUP
                 description = "Performs basic verifications before making a MR like running Detekt, tests, etc."
@@ -82,6 +84,8 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
     private inner class RegisterPrePublishCheck(private val currentProject: Project) {
 
         operator fun invoke() {
+            // Changes to this task must be synchronized with the deploy.yml workflow
+            // to run the same checks on the CI as well
             currentProject.tasks.register(PRE_PUBLISH_CHECK_TASK_NAME) {
                 group = Constants.ACKEE_TASKS_GROUP
                 description = "Performs all necessary verifications before publishing new artifacts versions"
@@ -112,7 +116,7 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
                 // We need to publish the latest versions to Maven local first before we can run tests
                 // on published artifacts
                 project.executeGradleTask(taskName = "publishToMavenLocal")
-                project.executeGradleTask(taskName = Constants.ARTIFACTS_TESTS_TASK_NAME)
+                project.executeGradleTask(taskName = ":$SAMPLE_APP_NAME:testDebugUnitTest")
             }
         }
 
@@ -124,7 +128,7 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
                 project = project,
             )
             when (result) {
-                is ExecuteCommand.Result.Success -> logger.info(result.commandOutput)
+                is ExecuteCommand.Result.Success -> println(result.commandOutput)
                 is ExecuteCommand.Result.Error -> throw GradleException(result.commandOutput)
             }
         }

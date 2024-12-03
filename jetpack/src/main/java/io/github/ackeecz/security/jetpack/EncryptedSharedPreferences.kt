@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This file is based on the original EncryptedSharedPreferences from Jetpack Security Crypto library
+ * https://developer.android.com/reference/kotlin/androidx/security/crypto/EncryptedSharedPreferences
  */
 package io.github.ackeecz.security.jetpack
 
@@ -66,15 +69,15 @@ private const val VALUE_KEYSET_ALIAS = "__androidx_security_crypto_encrypted_pre
  *
  * Basic use of the class:
  *```
- * val sharedPreferences = EncryptedSharedPreferences.create(
- *     context = context,
+ * val encryptedSharedPreferences = EncryptedSharedPreferences.create(
  *     fileName = "secret_shared_prefs",
  *     getMasterKey = { MasterKey.getOrCreate() },
+ *     context = context,
  *     prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
  *     prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
  * )
  * // Use EncryptedSharedPreferences and Editor as you would normally use SharedPreferences
- * sharedPreferences.edit {
+ * encryptedSharedPreferences.edit {
  *     putString("secret_key", "secret_value")
  * }
  *```
@@ -248,16 +251,16 @@ public interface EncryptedSharedPreferences {
          * @throws IOException when [fileName] can not be used
          */
         public fun create(
-            context: Context,
             fileName: String,
             getMasterKey: suspend () -> MasterKey,
+            context: Context,
             prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
             prefValueEncryptionScheme: PrefValueEncryptionScheme,
         ): EncryptedSharedPreferences {
             return create(
-                context = context,
                 fileName = fileName,
                 getMasterKey = getMasterKey,
+                context = context,
                 prefKeyEncryptionScheme = prefKeyEncryptionScheme,
                 prefValueEncryptionScheme = prefValueEncryptionScheme,
                 weakReferenceFactory = WeakReferenceFactory(),
@@ -268,18 +271,18 @@ public interface EncryptedSharedPreferences {
         @Suppress("LongParameterList")
         @VisibleForTesting
         internal fun create(
-            context: Context,
             fileName: String,
             getMasterKey: suspend () -> MasterKey,
+            context: Context,
             prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
             prefValueEncryptionScheme: PrefValueEncryptionScheme,
             weakReferenceFactory: WeakReferenceFactory,
             defaultDispatcher: CoroutineDispatcher,
         ): EncryptedSharedPreferences {
             return EncryptedSharedPreferencesImpl(
-                context = context,
                 fileName = fileName,
                 getMasterKey = getMasterKey,
+                context = context,
                 prefKeyEncryptionScheme = prefKeyEncryptionScheme,
                 prefValueEncryptionScheme = prefValueEncryptionScheme,
                 weakReferenceFactory = weakReferenceFactory,

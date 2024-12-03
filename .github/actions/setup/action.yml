@@ -1,0 +1,11 @@
+name: Setup
+description: Action that performs common setup tasks like setting up Java
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'corretto'

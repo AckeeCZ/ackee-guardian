@@ -1,0 +1,31 @@
+# This action's steps must be synced with preMergeRequestCheck Gradle task's checks to ensure that
+# we check required stuff on CI and at the same time developers can run the Gradle task to verify their
+# changes before making a PR. This action can be used in more workflows than just PR, since these
+# basic pre merge request checks (Detekt, library tests, ...) are fundamental to be checked in
+# basically all situations like merging, pushing to dev, etc.
+name: Basic preflight check
+description: Action that contains basic checks like running Detekt or library tests that are common to multiple workflows
+
+runs:
+  using: "composite"
+  steps:
+    - name: Detekt
+      shell: bash
+      run: ./gradlew detekt
+
+    - name: Assemble release variant
+      shell: bash
+      # Exclude sample app module from build. It requires the library artifacts to be published.
+      run: ./gradlew assembleRelease -x :app:assembleRelease
+
+    - name: Library tests
+      shell: bash
+      run: ./gradlew testDebugUnitTest -x :app:testDebugUnitTest
+
+    - name: Binary compatibility check
+      shell: bash
+      run: ./gradlew apiCheck
+
+    - name: Build logic tests
+      shell: bash
+      run: ./gradlew build-logic:logic:test
