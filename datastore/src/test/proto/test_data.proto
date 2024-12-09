@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option java_package = "io.github.ackeecz.security.datastore";
+option java_package = "io.github.ackeecz.guardian.datastore";
 option java_multiple_files = true;
 
 message TestData {

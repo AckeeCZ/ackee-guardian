@@ -1,15 +1,15 @@
 import org.gradle.kotlin.dsl.android
 
 plugins {
-    alias(libs.plugins.ackeecz.security.android.library)
-    alias(libs.plugins.ackeecz.security.publishing)
-    alias(libs.plugins.ackeecz.security.testing)
-    alias(libs.plugins.ackeecz.security.testing.android)
-    alias(libs.plugins.ackeecz.security.testing.protobuf)
+    alias(libs.plugins.ackeecz.guardian.android.library)
+    alias(libs.plugins.ackeecz.guardian.publishing)
+    alias(libs.plugins.ackeecz.guardian.testing)
+    alias(libs.plugins.ackeecz.guardian.testing.android)
+    alias(libs.plugins.ackeecz.guardian.testing.protobuf)
 }
 
 android {
-    namespace = "io.github.ackeecz.security.datastore"
+    namespace = "io.github.ackeecz.guardian.datastore"
 }
 
 dependencies {

@@ -1,12 +1,12 @@
 plugins {
-    alias(libs.plugins.ackeecz.security.android.library)
-    alias(libs.plugins.ackeecz.security.publishing)
-    alias(libs.plugins.ackeecz.security.testfixtures)
-    alias(libs.plugins.ackeecz.security.tink)
+    alias(libs.plugins.ackeecz.guardian.android.library)
+    alias(libs.plugins.ackeecz.guardian.publishing)
+    alias(libs.plugins.ackeecz.guardian.testfixtures)
+    alias(libs.plugins.ackeecz.guardian.tink)
 }
 
 android {
-    namespace = "io.github.ackeecz.security.datastore.core.internal"
+    namespace = "io.github.ackeecz.guardian.datastore.core.internal"
 }
 
 dependencies {
