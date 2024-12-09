@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.ackeecz.security.preflightchecks) apply true
+    alias(libs.plugins.ackeecz.guardian.preflightchecks) apply true
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.detekt) apply false

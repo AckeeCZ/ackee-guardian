@@ -1,17 +1,17 @@
-public final class io/github/ackeecz/security/datastore/core/DataStoreCryptoParams {
-	public fun <init> (Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun getEncryptionScheme ()Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;
+public final class io/github/ackeecz/guardian/datastore/core/DataStoreCryptoParams {
+	public fun <init> (Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getEncryptionScheme ()Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;
 	public final fun getGetMasterKey ()Lkotlin/jvm/functions/Function1;
 	public final fun getKeysetAlias ()Ljava/lang/String;
 	public final fun getKeysetPrefsName ()Ljava/lang/String;
 }
 
-public final class io/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme : java/lang/Enum {
-	public static final field AES256_GCM_HKDF_1MB Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;
-	public static final field AES256_GCM_HKDF_4KB Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;
+public final class io/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme : java/lang/Enum {
+	public static final field AES256_GCM_HKDF_1MB Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;
+	public static final field AES256_GCM_HKDF_4KB Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;
-	public static fun values ()[Lio/github/ackeecz/security/datastore/core/DataStoreEncryptionScheme;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;
+	public static fun values ()[Lio/github/ackeecz/guardian/datastore/core/DataStoreEncryptionScheme;
 }
 

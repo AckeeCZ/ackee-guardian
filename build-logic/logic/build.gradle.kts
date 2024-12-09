@@ -36,47 +36,47 @@ dependencies {
 gradlePlugin {
     plugins {
         plugin(
-            dependency = libs.plugins.ackeecz.security.android.application,
+            dependency = libs.plugins.ackeecz.guardian.android.application,
             pluginClassSimpleName = "AndroidApplicationPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.android.library,
+            dependency = libs.plugins.ackeecz.guardian.android.library,
             pluginClassSimpleName = "AndroidLibraryPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.preflightchecks,
+            dependency = libs.plugins.ackeecz.guardian.preflightchecks,
             pluginClassSimpleName = "RegisterPreflightChecksPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.publishing,
+            dependency = libs.plugins.ackeecz.guardian.publishing,
             pluginClassSimpleName = "PublishingPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.testfixtures,
+            dependency = libs.plugins.ackeecz.guardian.testfixtures,
             pluginClassSimpleName = "TestFixturesPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.testing.asProvider(),
+            dependency = libs.plugins.ackeecz.guardian.testing.asProvider(),
             pluginClassSimpleName = "TestingPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.testing.android,
+            dependency = libs.plugins.ackeecz.guardian.testing.android,
             pluginClassSimpleName = "TestingAndroidPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.testing.protobuf,
+            dependency = libs.plugins.ackeecz.guardian.testing.protobuf,
             pluginClassSimpleName = "TestingProtobufPlugin",
         )
 
         plugin(
-            dependency = libs.plugins.ackeecz.security.tink,
+            dependency = libs.plugins.ackeecz.guardian.tink,
             pluginClassSimpleName = "TinkPlugin",
         )
     }
@@ -89,6 +89,6 @@ private fun NamedDomainObjectContainer<PluginDeclaration>.plugin(
     val pluginId = dependency.get().pluginId
     register(pluginId) {
         id = pluginId
-        implementationClass = "io.github.ackeecz.security.plugin.$pluginClassSimpleName"
+        implementationClass = "io.github.ackeecz.guardian.plugin.$pluginClassSimpleName"
     }
 }

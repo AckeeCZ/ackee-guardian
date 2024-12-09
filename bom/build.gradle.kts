@@ -1,8 +1,8 @@
-import io.github.ackeecz.security.verification.task.VerifyBomVersionTask
+import io.github.ackeecz.guardian.verification.task.VerifyBomVersionTask
 
 plugins {
     `java-platform`
-    alias(libs.plugins.ackeecz.security.publishing)
+    alias(libs.plugins.ackeecz.guardian.publishing)
 }
 
 dependencies {

@@ -72,12 +72,12 @@ mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublis
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }
 
 # Contention plugins defined by this project
-ackeecz-security-android-application = { id = "ackeecz.security.android.application" }
-ackeecz-security-android-library = { id = "ackeecz.security.android.library" }
-ackeecz-security-preflightchecks = { id = "ackeecz.security.preflightchecks" }
-ackeecz-security-publishing = { id = "ackeecz.security.publishing" }
-ackeecz-security-testfixtures = { id = "ackeecz.security.testfixtures" }
-ackeecz-security-testing = { id = "ackeecz.security.testing" }
-ackeecz-security-testing-android = { id = "ackeecz.security.testing.android" }
-ackeecz-security-testing-protobuf = { id = "ackeecz.security.testing.protobuf" }
-ackeecz-security-tink = { id = "ackeecz.security.tink" }
+ackeecz-guardian-android-application = { id = "ackeecz.guardian.android.application" }
+ackeecz-guardian-android-library = { id = "ackeecz.guardian.android.library" }
+ackeecz-guardian-preflightchecks = { id = "ackeecz.guardian.preflightchecks" }
+ackeecz-guardian-publishing = { id = "ackeecz.guardian.publishing" }
+ackeecz-guardian-testfixtures = { id = "ackeecz.guardian.testfixtures" }
+ackeecz-guardian-testing = { id = "ackeecz.guardian.testing" }
+ackeecz-guardian-testing-android = { id = "ackeecz.guardian.testing.android" }
+ackeecz-guardian-testing-protobuf = { id = "ackeecz.guardian.testing.protobuf" }
+ackeecz-guardian-tink = { id = "ackeecz.guardian.tink" }

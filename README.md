@@ -1,12 +1,19 @@
-# Ackee Security
+# Ackee Guardian
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.ackeecz/security-bom)](https://central.sonatype.com/artifact/io.github.ackeecz/security-bom)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.ackeecz/guardian-bom)](https://central.sonatype.com/artifact/io.github.ackeecz/guardian-bom)
 
 ## Overview
 
-Ackee Security is a library focusing on a security-related logic. In [Ackee](https://www.ackee.cz/) 
-we mainly use it to share some common security-related implementations across our projects, but it 
+The galaxy has the Guardians of the Galaxy to fend off galactic threats and save us from cosmic chaos. 
+But who’s watching over your apps, shielding them from malicious attackers and software mischief?
+
+Enter **Ackee Guardian** – your app's fearless defender, standing strong against the dark forces of bugs, 
+vulnerabilities, and threats. Just as the Guardians of the Galaxy protect the universe, Ackee Guardian 
+ensures your Android app stays secure and your users stay safe.
+
+Ackee Guardian focuses on a security-related logic. In [Ackee](https://www.ackee.cz/) 
+we use it to share some common security implementations across our projects, but it 
 contains useful logic suited for anyone's needs. More specifically, you can use it as a 100% 
 compatible replacement for [Jetpack Security Crypto](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary) 
 library and there is more!
@@ -21,7 +28,7 @@ Library consists of several modules:
 
 ### Core
 
-Contains basic core security-related logic like `MasterKey` class (rewritten from Jetpack Security)
+Contains basic core security logic like `MasterKey` class (rewritten from Jetpack Security)
 that is used by other modules to encrypt the data. You don't have to depend on this module directly,
 if you use `datastore` modules or `jetpack`.
 
@@ -98,9 +105,9 @@ pairs that made unnecessary extra encryptions/decryptions under the hood.
 used in Jetpack Security, that also had some synchronization issues, that were fixed in later releases.
 - Since one of the major issues of Jetpack Security was an outdated Tink library, which makes all the
 crypto operations and Jetpack Security was basically just a thin abstraction over it, we wanted to 
-try to prevent the same issues in the future and so we decided to force clients of Ackee Security library
+try to prevent the same issues in the future and so we decided to force clients of Ackee Guardian library
 to depend on Tink explicitly. This allows clients to have a better control over updates, independent
-of Ackee Security updates.
+of Ackee Guardian updates.
 - Fix several bugs discovered in `EncryptedSharedPreferences` during covering the logic by tests:
   - If you saved empty string `Set`, you didn't get it back by using `getStringSet`, but you got 
     default value passed in parameter instead.
@@ -120,22 +127,22 @@ of Ackee Security updates.
 
 Add the following dependencies to your `libs.versions.toml`, depending on what you need. You should
 always use BOM to be sure to get binary compatible dependencies. If you need only `jetpack` features,
-just declare BOM and `io.github.ackeecz:security-jetpack`. If you need only particular DataStore, 
-then declare BOM and particular DataStore dependency, e.g. `io.github.ackeecz:security-datastore`.
-You don't need to declare `io.github.ackeecz:security-core` dependency, unless you depend only on
+just declare BOM and `io.github.ackeecz:guardian-jetpack`. If you need only particular DataStore, 
+then declare BOM and particular DataStore dependency, e.g. `io.github.ackeecz:guardian-datastore`.
+You don't need to declare `io.github.ackeecz:guardian-core` dependency, unless you depend only on
 `core` without any DataStore or `jetpack` modules.
 
 ```toml
 [versions]
-ackee-security-bom = "SPECIFY_VERSION"
+ackee-guardian-bom = "SPECIFY_VERSION"
 tink = "SPECIFY_VERSION"
 
 [libraries]
-ackee-security-bom = { module = "io.github.ackeecz:security-bom", version.ref = "ackee-security-bom" }
-ackee-security-core = { module = "io.github.ackeecz:security-core" }
-ackee-security-datastore = { module = "io.github.ackeecz:security-datastore" }
-ackee-security-datastore-preferences = { module = "io.github.ackeecz:security-datastore-preferences" }
-ackee-security-jetpack = { module = "io.github.ackeecz:security-jetpack" }
+ackee-guardian-bom = { module = "io.github.ackeecz:guardian-bom", version.ref = "ackee-guardian-bom" }
+ackee-guardian-core = { module = "io.github.ackeecz:guardian-core" }
+ackee-guardian-datastore = { module = "io.github.ackeecz:guardian-datastore" }
+ackee-guardian-datastore-preferences = { module = "io.github.ackeecz:guardian-datastore-preferences" }
+ackee-guardian-jetpack = { module = "io.github.ackeecz:guardian-jetpack" }
 
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 ```
@@ -146,20 +153,20 @@ Then specify dependencies in your `build.gradle.kts`:
 dependencies {
 
     // Always use BOM
-    implementation(platform(libs.ackee.security.bom))
+    implementation(platform(libs.ackee.guardian.bom))
     // Optional core dependency. Needed to be specified only if you do not use any other artifact
     // and want to use core in your app.
-    implementation(libs.ackee.security.core)
+    implementation(libs.ackee.guardian.core)
     // For encrypted DataStore
-    implementation(libs.ackee.security.datastore)
+    implementation(libs.ackee.guardian.datastore)
     // For encrypted preferences DataStore
-    implementation(libs.ackee.security.datastore.preferences)
+    implementation(libs.ackee.guardian.datastore.preferences)
      // For Jetpack Security port
-    implementation(libs.ackee.security.jetpack)
+    implementation(libs.ackee.guardian.jetpack)
 
-    // Dependency on Tink must be included explicitly. This allows clients of Ackee Security library 
+    // Dependency on Tink must be included explicitly. This allows clients of Ackee Guardian library 
     // to control the version of Tink themselves, being able to keep it up-to-date as much as possible 
-    // and not depend on Ackee Security releases.
+    // and not depend on Ackee Guardian releases.
     implementation(libs.tink.android)
 }
 ```
