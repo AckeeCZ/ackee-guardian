@@ -71,7 +71,7 @@ kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compa
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-gradlePlugin" }
 
-# Contention plugins defined by this project
+# Convention plugins defined by this project
 ackeecz-guardian-android-application = { id = "ackeecz.guardian.android.application" }
 ackeecz-guardian-android-library = { id = "ackeecz.guardian.android.library" }
 ackeecz-guardian-preflightchecks = { id = "ackeecz.guardian.preflightchecks" }
