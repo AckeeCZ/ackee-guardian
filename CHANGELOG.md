@@ -11,7 +11,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### datastore-preferences
 ### jetpack
 
-## BOM [1.0.0] - TBD
+## BOM [1.0.0]
 
 ### core
 #### Added
