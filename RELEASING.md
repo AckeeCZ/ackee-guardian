@@ -11,8 +11,8 @@ explains the steps in a great detail. Otherwise you can use TLDR version.
 2. Update `CHANGELOG` for the new release.
 3. Create a tag for the new BOM version in the required format.
 4. Run `prePublishCheck` Gradle task and fix all found issues if needed.
-5. If you were forced to publish more artifacts, update `CHANGELOG` and fast-forward the tag to the
-    latest commit.
+5. If you were forced to do some changes, fast-forward the tag to the latest commit. Don't forget
+    to update `CHANGELOG` if you were forced to publish more artifacts.
 6. Push the tag. CI will perform necessary checks and publish all artifacts.
 
 ## Long version
@@ -40,7 +40,7 @@ Once you are ready to publish new versions of library artifacts, you can start p
     runs all custom check tasks mentioned above, so you actually do not have to run them separately and
     you can just run `prePublishCheck`, but it is good to know that they exist and what they do. You
     can also find more detailed information in the documentation comments in the source code of those tasks.
-5. If you were forced to publish more artifacts, update `CHANGELOG` and fast-forward the tag to the
-   latest commit.
+5. If you were forced to do some changes, fast-forward the tag to the latest commit. Don't forget
+   to update `CHANGELOG` if you were forced to publish more artifacts.
 6. Push the tag. CI will perform necessary checks and publish all artifacts.
 
