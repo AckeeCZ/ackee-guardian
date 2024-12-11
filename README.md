@@ -12,8 +12,8 @@ Enter **Ackee Guardian** – your app's fearless defender, standing strong again
 vulnerabilities, and threats. Just as the Guardians of the Galaxy protect the universe, Ackee Guardian 
 ensures your Android app stays secure and your users stay safe.
 
-Ackee Guardian focuses on a security-related logic. In [Ackee](https://www.ackee.cz/) 
-we use it to share some common security implementations across our projects, but it 
+Ackee Guardian focuses on cryptography and in [Ackee](https://www.ackee.cz/) 
+we use it to share some common cryptographic implementations across our projects, but it 
 contains useful logic suited for anyone's needs. More specifically, you can use it as a 100% 
 compatible replacement for [Jetpack Security Crypto](https://developer.android.com/reference/kotlin/androidx/security/crypto/package-summary) 
 library and there is more!
@@ -28,7 +28,7 @@ Library consists of several modules:
 
 ### Core
 
-Contains basic core security logic like `MasterKey` class (rewritten from Jetpack Security)
+Contains basic core cryptographic logic like `MasterKey` class (rewritten from Jetpack Security)
 that is used by other modules to encrypt the data. You don't have to depend on this module directly,
 if you use `datastore` modules or `jetpack`.
 
