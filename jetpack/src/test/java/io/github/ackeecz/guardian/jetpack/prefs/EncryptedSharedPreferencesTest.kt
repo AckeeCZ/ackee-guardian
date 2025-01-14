@@ -7,6 +7,7 @@ import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.core.internal.AndroidTestWithKeyStore
 import io.github.ackeecz.guardian.core.internal.WeakReferenceFactoryFake
 import io.github.ackeecz.guardian.core.internal.junit.rule.CoroutineRule
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences.PrefKeyEncryptionScheme
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences.PrefValueEncryptionScheme
@@ -39,6 +40,7 @@ internal abstract class EncryptedSharedPreferencesTest : AndroidTestWithKeyStore
             getMasterKey = getMasterKey,
             prefKeyEncryptionScheme = prefKeyEncryptionScheme,
             prefValueEncryptionScheme = prefValueEncryptionScheme,
+            keyStoreSemaphore = AndroidKeyStoreSemaphore,
             weakReferenceFactory = weakReferenceFactory,
             defaultDispatcher = coroutineRule.testDispatcher,
         )

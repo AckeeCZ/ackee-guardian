@@ -32,6 +32,29 @@ Contains basic core cryptographic logic like `MasterKey` class (rewritten from J
 that is used by other modules to encrypt the data. You don't have to depend on this module directly,
 if you use `datastore` modules or `jetpack`.
 
+#### Android KeyStore synchronization
+
+Android KeyStore is not thread-safe and its operations must be synchronized to avoid errors on various
+range of devices. Ackee Guardian synchronizes all Android KeyStore operations performed under the hood
+using a single `AndroidKeyStoreSemaphore` object.
+
+It is important to know that you need to synchronize all KeyStore operations, not only those using 
+`KeyStore` class, but even all others using various classes from JCA that are backed-up by 
+AndroidKeyStore provider implementation. This includes e.g. `KeyGenerator` for key generation in 
+Android KeyStore or `Cipher` for encryption/decryption using keys stored in Android KeyStore. 
+These operations have to be synchronized across your whole app, so even though Ackee Guardian 
+synchronizes operations under the hood, you need to synchronize your custom operations involving 
+Android KeyStore together with those in Ackee Guardian. Guardian already provides some abstractions 
+over JCA APIs backed by AndroidKeyStore provider, that are properly synchronized like 
+`SynchronizedAndroidKeyStore` or `SynchronizedAndroidKeyGenerator`, that you can use without any 
+other synchronization code. However, not all JCA APIs are covered or maybe you can't use provided 
+abstractions for some reason. In these cases, the simplest way to synchronize everything correctly 
+is to wrap all your Android KeyStore operations in the `AndroidKeyStoreSemaphore.withPermit` calls.
+
+There is more options how you can approach the synchronization using Ackee Guardian, which are
+discussed in more detail in `AndroidKeyStoreSemaphore` documentation, that also provides more
+information about this topic and implementation in Guardian.
+
 ### DataStore
 
 DataStore modules provide an encrypted version of `DataStore`s. They use [Tink](https://github.com/tink-crypto/tink-java)

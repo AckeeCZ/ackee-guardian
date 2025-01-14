@@ -8,11 +8,14 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import io.github.ackeecz.guardian.datastore.core.DataStoreCryptoParams
 import io.github.ackeecz.guardian.datastore.core.internal.DataStoreDelegate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.sync.Semaphore
+import java.security.KeyStore
 import kotlin.properties.ReadOnlyProperty
 
 /**
@@ -20,6 +23,9 @@ import kotlin.properties.ReadOnlyProperty
  * only be called once in a file (at the top level), and all usages of the [DataStore] should use a
  * reference to the same instance. The receiver type for the property delegate must be an instance
  * of [Context].
+ *
+ * All Android [KeyStore] operations are synchronized using a provided [keyStoreSemaphore].
+ * More info about this topic can be found in [AndroidKeyStoreSemaphore] documentation.
  *
  * Example usage:
  * ```
@@ -49,15 +55,21 @@ import kotlin.properties.ReadOnlyProperty
  * producer and migration may be run more than once whether or not it already succeeded
  * (potentially because another migration failed or a write to disk failed.)
  * @param scope The scope in which IO operations and transform functions will execute.
+ * @param keyStoreSemaphore [Semaphore] used to synchronize Android [KeyStore] operations.
+ * It is recommended to use a default [AndroidKeyStoreSemaphore], if you really don't need
+ * to provide a custom [Semaphore].
  *
  * @return a property delegate that manages an encrypted preferences datastore as a singleton.
  */
+@JvmOverloads
+@Suppress("LongParameterList")
 public fun encryptedPreferencesDataStore(
     cryptoParams: DataStoreCryptoParams,
     name: String,
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     produceMigrations: (Context) -> List<DataMigration<Preferences>> = { emptyList() },
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore,
 ): ReadOnlyProperty<Context, DataStore<Preferences>> {
     return EncryptedPreferenceDataStoreDelegate(
         cryptoParams = cryptoParams,
@@ -65,6 +77,7 @@ public fun encryptedPreferencesDataStore(
         corruptionHandler = corruptionHandler,
         produceMigrations = produceMigrations,
         scope = scope,
+        keyStoreSemaphore = keyStoreSemaphore,
     )
 }
 
@@ -74,6 +87,7 @@ private class EncryptedPreferenceDataStoreDelegate(
     private val corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
     private val produceMigrations: (Context) -> List<DataMigration<Preferences>>,
     private val scope: CoroutineScope,
+    private val keyStoreSemaphore: Semaphore,
 ) : DataStoreDelegate<Preferences>() {
 
     override fun createDataStore(applicationContext: Context): DataStore<Preferences> {
@@ -82,7 +96,8 @@ private class EncryptedPreferenceDataStoreDelegate(
             cryptoParams = cryptoParams,
             corruptionHandler = corruptionHandler,
             migrations = produceMigrations(applicationContext),
-            scope = scope
+            scope = scope,
+            keyStoreSemaphore = keyStoreSemaphore,
         ) {
             applicationContext.preferencesDataStoreFile(fileName)
         }

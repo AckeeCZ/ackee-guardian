@@ -21,18 +21,20 @@ package io.github.ackeecz.guardian.core
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.VisibleForTesting
+import io.github.ackeecz.guardian.core.MasterKey.Companion.createSafeDefaultSpecBuilder
+import io.github.ackeecz.guardian.core.MasterKey.Companion.getOrCreate
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
+import io.github.ackeecz.guardian.core.keystore.android.SynchronizedAndroidKeyGenerator
+import io.github.ackeecz.guardian.core.keystore.android.SynchronizedAndroidKeyStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.security.GeneralSecurityException
 import java.security.KeyStore
 import java.security.ProviderException
-import javax.crypto.KeyGenerator
-import kotlin.also
-import kotlin.collections.contentEquals
-import kotlin.collections.contentToString
 
 private val keyMutex = Mutex()
 
@@ -42,6 +44,9 @@ private val keyMutex = Mutex()
  * by calling [getOrCreate] method and pass [KeyGenParameterSpec], which can be built manually or
  * by using [createSafeDefaultSpecBuilder] method for getting a [KeyGenParameterSpec.Builder]
  * configured with safe default parameters.
+ *
+ * Operations with Android [KeyStore] are synchronized using a provided [Semaphore]. More info about
+ * this topic can be found in [AndroidKeyStoreSemaphore] documentation.
  */
 public class MasterKey private constructor(public val alias: String) {
 
@@ -92,22 +97,29 @@ public class MasterKey private constructor(public val alias: String) {
         /**
          * Gets the [MasterKey]. If it does not exist yet, it is created with the provided
          * [keyGenParameterSpec].
+         *
+         * Android [KeyStore] operations are synchronized using [keyStoreSemaphore]. It is recommended
+         * to use a default [AndroidKeyStoreSemaphore], if you really don't need to provide a custom
+         * [Semaphore].
          */
+        @JvmOverloads
         public suspend fun getOrCreate(
             keyGenParameterSpec: KeyGenParameterSpec = createSafeDefaultSpecBuilder().build(),
+            keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore,
         ): MasterKey {
-            return provider.getOrCreate(keyGenParameterSpec)
+            return provider.getOrCreate(keyGenParameterSpec, keyStoreSemaphore)
         }
     }
 
     @VisibleForTesting
     internal class Provider(private val defaultDispatcher: CoroutineDispatcher) {
 
-        private val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE).also { it.load(null) }
-
-        suspend fun getOrCreate(keyGenParameterSpec: KeyGenParameterSpec): MasterKey {
+        suspend fun getOrCreate(
+            keyGenParameterSpec: KeyGenParameterSpec,
+            keyStoreSemaphore: Semaphore,
+        ): MasterKey {
             validate(keyGenParameterSpec)
-            generateKeyIfNeeded(keyGenParameterSpec)
+            generateKeyIfNeeded(keyGenParameterSpec, keyStoreSemaphore)
             return MasterKey(keyGenParameterSpec.keystoreAlias)
         }
 
@@ -129,24 +141,29 @@ public class MasterKey private constructor(public val alias: String) {
             }
         }
 
-        private suspend fun generateKeyIfNeeded(spec: KeyGenParameterSpec) {
-            fun keyDoesNotExist() = !keyStore.containsAlias(spec.keystoreAlias)
+        private suspend fun generateKeyIfNeeded(spec: KeyGenParameterSpec, keyStoreSemaphore: Semaphore) {
+            val keyStore = SynchronizedAndroidKeyStore(keyStoreSemaphore)
+
+            suspend fun keyDoesNotExist() = !keyStore.containsAlias(spec.keystoreAlias)
 
             if (keyDoesNotExist()) {
                 keyMutex.withLock {
                     if (keyDoesNotExist()) {
-                        generateKey(spec)
+                        generateKey(spec, keyStoreSemaphore)
                     }
                 }
             }
         }
 
-        private suspend fun generateKey(keyGenParameterSpec: KeyGenParameterSpec) {
+        private suspend fun generateKey(
+            keyGenParameterSpec: KeyGenParameterSpec,
+            keyStoreSemaphore: Semaphore,
+        ) {
             withContext(defaultDispatcher) {
                 try {
-                    val keyGenerator = KeyGenerator.getInstance(
+                    val keyGenerator = SynchronizedAndroidKeyGenerator.getInstance(
                         KeyProperties.KEY_ALGORITHM_AES,
-                        ANDROID_KEY_STORE,
+                        keyStoreSemaphore,
                     )
                     keyGenerator.init(keyGenParameterSpec)
                     keyGenerator.generateKey()
@@ -156,11 +173,6 @@ public class MasterKey private constructor(public val alias: String) {
                     throw GeneralSecurityException(providerException.message, providerException)
                 }
             }
-        }
-
-        companion object {
-
-            private const val ANDROID_KEY_STORE = "AndroidKeyStore"
         }
     }
 }
