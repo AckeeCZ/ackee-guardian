@@ -4,6 +4,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import io.github.ackeecz.guardian.core.internal.AndroidTestWithKeyStore
 import io.github.ackeecz.guardian.core.internal.junit.rule.CoroutineRule
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -87,7 +88,7 @@ internal class MasterKeyTest : AndroidTestWithKeyStore() {
     private suspend fun getOrCreateMasterKey(
         spec: KeyGenParameterSpec = MasterKey.createSafeDefaultSpecBuilder().build(),
     ): MasterKey {
-        return masterKeyProvider.getOrCreate(spec)
+        return masterKeyProvider.getOrCreate(spec, AndroidKeyStoreSemaphore)
     }
 
     @Test

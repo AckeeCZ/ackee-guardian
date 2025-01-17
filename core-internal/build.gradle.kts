@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.ackeecz.guardian.android.library)
     alias(libs.plugins.ackeecz.guardian.publishing)
     alias(libs.plugins.ackeecz.guardian.testfixtures)
+    alias(libs.plugins.ackeecz.guardian.tink)
 }
 
 android {

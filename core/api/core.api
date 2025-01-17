@@ -11,6 +11,76 @@ public final class io/github/ackeecz/guardian/core/MasterKey$Companion {
 	public final fun createSafeDefaultSpecBuilder (Ljava/lang/String;)Landroid/security/keystore/KeyGenParameterSpec$Builder;
 	public static synthetic fun createSafeDefaultSpecBuilder$default (Lio/github/ackeecz/guardian/core/MasterKey$Companion;Ljava/lang/String;ILjava/lang/Object;)Landroid/security/keystore/KeyGenParameterSpec$Builder;
 	public final fun getOrCreate (Landroid/security/keystore/KeyGenParameterSpec;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun getOrCreate$default (Lio/github/ackeecz/guardian/core/MasterKey$Companion;Landroid/security/keystore/KeyGenParameterSpec;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getOrCreate (Landroid/security/keystore/KeyGenParameterSpec;Lkotlinx/coroutines/sync/Semaphore;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getOrCreate (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun getOrCreate$default (Lio/github/ackeecz/guardian/core/MasterKey$Companion;Landroid/security/keystore/KeyGenParameterSpec;Lkotlinx/coroutines/sync/Semaphore;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/ackeecz/guardian/core/keystore/android/AndroidKeyStoreSemaphore : kotlinx/coroutines/sync/Semaphore {
+	public static final field INSTANCE Lio/github/ackeecz/guardian/core/keystore/android/AndroidKeyStoreSemaphore;
+	public fun acquire (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getAvailablePermits ()I
+	public fun release ()V
+	public final fun setPermits (I)V
+	public fun tryAcquire ()Z
+}
+
+public abstract interface class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator {
+	public static final field Companion Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator$Companion;
+	public abstract fun generateKey (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAlgorithm ()Ljava/lang/String;
+	public abstract fun init (I)V
+	public abstract fun init (ILjava/security/SecureRandom;)V
+	public abstract fun init (Ljava/security/SecureRandom;)V
+	public abstract fun init (Ljava/security/spec/AlgorithmParameterSpec;)V
+	public abstract fun init (Ljava/security/spec/AlgorithmParameterSpec;Ljava/security/SecureRandom;)V
+}
+
+public final class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator$Companion {
+	public final fun getInstance (Ljava/lang/String;Lkotlinx/coroutines/sync/Semaphore;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator;
+	public static synthetic fun getInstance$default (Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator$Companion;Ljava/lang/String;Lkotlinx/coroutines/sync/Semaphore;ILjava/lang/Object;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyGenerator;
+}
+
+public abstract interface class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator {
+	public static final field Companion Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator$Companion;
+	public abstract fun genKeyPair (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun generateKeyPair (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAlgorithm ()Ljava/lang/String;
+	public abstract fun initialize (I)V
+	public abstract fun initialize (ILjava/security/SecureRandom;)V
+	public abstract fun initialize (Ljava/security/spec/AlgorithmParameterSpec;)V
+	public abstract fun initialize (Ljava/security/spec/AlgorithmParameterSpec;Ljava/security/SecureRandom;)V
+}
+
+public final class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator$Companion {
+	public final fun getInstance (Ljava/lang/String;Lkotlinx/coroutines/sync/Semaphore;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator;
+	public static synthetic fun getInstance$default (Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator$Companion;Ljava/lang/String;Lkotlinx/coroutines/sync/Semaphore;ILjava/lang/Object;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyPairGenerator;
+}
+
+public abstract interface class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore {
+	public static final field Companion Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore$Companion;
+	public abstract fun aliases (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun containsAlias (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun deleteEntry (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun entryInstanceOf (Ljava/lang/String;Ljava/lang/Class;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getCertificate (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getCertificateAlias (Ljava/security/cert/Certificate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getCertificateChain (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getCreationDate (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getEntry (Ljava/lang/String;Ljava/security/KeyStore$ProtectionParameter;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getKey (Ljava/lang/String;[CLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getType (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isCertificateEntry (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isKeyEntry (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setCertificateEntry (Ljava/lang/String;Ljava/security/cert/Certificate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setEntry (Ljava/lang/String;Ljava/security/KeyStore$Entry;Ljava/security/KeyStore$ProtectionParameter;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setKeyEntry (Ljava/lang/String;Ljava/security/Key;[C[Ljava/security/cert/Certificate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setKeyEntry (Ljava/lang/String;[B[Ljava/security/cert/Certificate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun size (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore$Companion {
+	public final fun invoke (Lkotlinx/coroutines/sync/Semaphore;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore;
+	public static synthetic fun invoke$default (Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore$Companion;Lkotlinx/coroutines/sync/Semaphore;ILjava/lang/Object;)Lio/github/ackeecz/guardian/core/keystore/android/SynchronizedAndroidKeyStore;
 }
 

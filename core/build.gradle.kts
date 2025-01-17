@@ -11,6 +11,8 @@ android {
 
 dependencies {
 
+    implementation(projects.coreInternal)
+
     implementation(libs.androidx.annotation)
 
     implementation(platform(libs.coroutines.bom))

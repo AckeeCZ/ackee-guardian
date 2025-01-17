@@ -11,17 +11,20 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.PreferencesSerializer
 import androidx.datastore.preferences.preferencesDataStoreFile
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import io.github.ackeecz.guardian.datastore.core.DataStoreCryptoParams
 import io.github.ackeecz.guardian.datastore.core.internal.EncryptingSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.sync.Semaphore
 import okio.buffer
 import okio.sink
 import okio.source
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.security.KeyStore
 
 private const val REQUIRED_PREFERENCES_FILE_EXTENSION = "preferences_pb"
 
@@ -29,6 +32,9 @@ private const val REQUIRED_PREFERENCES_FILE_EXTENSION = "preferences_pb"
  * Creates an instance of encrypted preferences [DataStore]. Never create more than one instance of
  * DataStore for a given file. Doing so can break all DataStore functionality. You should
  * consider managing your DataStore instance as a singleton.
+ *
+ * All Android [KeyStore] operations are synchronized using a provided [keyStoreSemaphore].
+ * More info about this topic can be found in [AndroidKeyStoreSemaphore] documentation.
  *
  * @param context Context of the application. It is safe to pass an Activity context, but best
  * practice is to pass Application one to be sure to avoid potential memory leaks.
@@ -41,6 +47,9 @@ private const val REQUIRED_PREFERENCES_FILE_EXTENSION = "preferences_pb"
  * may be run more than once whether or not it already succeeded (potentially because another
  * migration failed or a write to disk failed.)
  * @param scope The scope in which IO operations and transform functions will execute.
+ * @param keyStoreSemaphore [Semaphore] used to synchronize Android [KeyStore] operations.
+ * It is recommended to use a default [AndroidKeyStoreSemaphore], if you really don't need
+ * to provide a custom [Semaphore].
  * @param produceFile Function which returns the file that the new DataStore will act on.
  * The function must return the same file every time. No two instances of DataStore
  * should act on the same file at the same time. The file must have the extension
@@ -49,6 +58,7 @@ private const val REQUIRED_PREFERENCES_FILE_EXTENSION = "preferences_pb"
  *
  * @return a new encrypted preferences DataStore instance with the provided configuration
  */
+@JvmOverloads
 @Suppress("LongParameterList")
 public fun PreferenceDataStoreFactory.createEncrypted(
     context: Context,
@@ -56,6 +66,7 @@ public fun PreferenceDataStoreFactory.createEncrypted(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     migrations: List<DataMigration<Preferences>> = emptyList(),
     scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore,
     produceFile: () -> File,
 ): DataStore<Preferences> {
     val dataStoreFile = produceFileWithCheck(produceFile)
@@ -64,6 +75,7 @@ public fun PreferenceDataStoreFactory.createEncrypted(
         cryptoParams = cryptoParams,
         delegate = OkioPreferencesSerializerAdapter,
         scope = scope,
+        keyStoreSemaphore = keyStoreSemaphore,
         dataStoreFile = dataStoreFile,
     )
     return create(

@@ -21,13 +21,16 @@ package io.github.ackeecz.guardian.jetpack
 import android.content.Context
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.StreamingAead
-import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import com.google.crypto.tink.streamingaead.AesGcmHkdfStreamingKeyManager
 import com.google.crypto.tink.streamingaead.StreamingAeadConfig
 import io.github.ackeecz.guardian.core.MasterKey
+import io.github.ackeecz.guardian.core.internal.AndroidKeysetManagerSynchronizedBuilder
 import io.github.ackeecz.guardian.core.internal.SynchronizedDataHolder
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
@@ -38,9 +41,13 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.channels.FileChannel
 import java.security.GeneralSecurityException
+import java.security.KeyStore
 
 /**
  * Class used to create and read encrypted files.
+ *
+ * All Android [KeyStore] operations are synchronized using a provided [Semaphore].
+ * More info about this topic can be found in [AndroidKeyStoreSemaphore] documentation.
  *
  * **WARNING**: The encrypted file should not be backed up with Auto Backup. When restoring the
  * file it is likely the key used to encrypt it will no longer be present. You should exclude all
@@ -70,9 +77,9 @@ import java.security.GeneralSecurityException
  * val encryptedInputStream = encryptedFile.openFileInput()
  * ```
  */
-public class EncryptedFile private constructor(private val builder: Builder) {
+public class EncryptedFile private constructor(private val fileBuilder: Builder) {
 
-    private val file = builder.file
+    private val file = fileBuilder.file
     private val associatedData = file.name.toByteArray(Charsets.UTF_8)
     private val streamingAeadHolder = StreamingAeadHolder()
 
@@ -120,18 +127,18 @@ public class EncryptedFile private constructor(private val builder: Builder) {
         return EncryptedFileInputStream(fileInputStream.fd, decryptingStream)
     }
 
-    private inner class StreamingAeadHolder : SynchronizedDataHolder<StreamingAead>(builder.backgroundDispatcher) {
+    private inner class StreamingAeadHolder : SynchronizedDataHolder<StreamingAead>() {
 
-        override suspend fun createSynchronizedData(): StreamingAead {
+        override suspend fun createSynchronizedData(): StreamingAead = withContext(fileBuilder.backgroundDispatcher) {
             StreamingAeadConfig.register()
-            return AndroidKeysetManager.Builder()
-                .withKeyTemplate(builder.encryptionScheme.keyTemplate)
+            return@withContext AndroidKeysetManagerSynchronizedBuilder(fileBuilder.keyStoreSemaphore)
+                .withKeyTemplate(fileBuilder.encryptionScheme.keyTemplate)
                 .withSharedPref(
-                    builder.context,
-                    builder.keysetAlias,
-                    builder.keysetPrefsFileName,
+                    fileBuilder.context,
+                    fileBuilder.keysetAlias,
+                    fileBuilder.keysetPrefsFileName,
                 )
-                .withMasterKeyUri(builder.getMasterKey().keyStoreUri)
+                .withMasterKeyUri(fileBuilder.getMasterKey().keyStoreUri)
                 .build()
                 .keysetHandle
                 .getPrimitive(StreamingAead::class.java)
@@ -225,6 +232,7 @@ public class EncryptedFile private constructor(private val builder: Builder) {
         internal var keysetPrefsFileName = KEYSET_PREFS_FILE_NAME
         internal var keysetAlias = KEYSET_ALIAS
         internal var backgroundDispatcher = Dispatchers.IO
+        internal var keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore
 
         /**
          * @param keysetPrefName The SharedPreferences file to store the keyset.
@@ -248,10 +256,20 @@ public class EncryptedFile private constructor(private val builder: Builder) {
 
         /**
          * Sets [dispatcher] to be used for heavy operations that should be run on "background"
-         * dispatcher
+         * dispatcher.
          */
         public fun setBackgroundDispatcher(dispatcher: CoroutineDispatcher): Builder {
             backgroundDispatcher = dispatcher
+            return this
+        }
+
+        /**
+         * Sets [semaphore] used to synchronize Android [KeyStore] operations. It is recommended to
+         * use a default [AndroidKeyStoreSemaphore], if you really don't need to provide a custom
+         * [Semaphore].
+         */
+        public fun setKeyStoreSemaphore(semaphore: Semaphore): Builder {
+            keyStoreSemaphore = semaphore
             return this
         }
 

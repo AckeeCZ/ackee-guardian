@@ -1,9 +1,7 @@
 package io.github.ackeecz.guardian.core.internal
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 /**
  * Holder of [T], which creation is synchronized in the scope of the instance of
@@ -11,9 +9,7 @@ import kotlinx.coroutines.withContext
  * [T] can run concurrently in multiple threads, where each operates on different
  * instance of this class.
  */
-public abstract class SynchronizedDataHolder<T : Any>(
-    private val defaultDispatcher: CoroutineDispatcher,
-) {
+public abstract class SynchronizedDataHolder<T : Any> {
 
     private val mutex = Mutex()
 
@@ -26,16 +22,15 @@ public abstract class SynchronizedDataHolder<T : Any>(
     public suspend fun getOrCreate(): T {
         return synchronizedData ?: mutex.withLock {
             if (synchronizedData == null) {
-                synchronizedData = withContext(defaultDispatcher) { createSynchronizedData() }
+                synchronizedData = createSynchronizedData()
             }
             requireNotNull(synchronizedData)
         }
     }
 
     /**
-     * Creates [T]. This method is called from [defaultDispatcher] and is synchronized in the scope
-     * of this instance, i.e. for each [SynchronizedDataHolder] instance this will be called just
-     * once.
+     * Creates [T]. This method is synchronized in the scope of this instance, i.e. for each
+     * [SynchronizedDataHolder] instance this will be called just once.
      */
     protected abstract suspend fun createSynchronizedData(): T
 }

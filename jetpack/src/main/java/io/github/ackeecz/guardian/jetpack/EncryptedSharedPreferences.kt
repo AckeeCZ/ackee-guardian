@@ -29,20 +29,22 @@ import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.daead.AesSivKeyManager
 import com.google.crypto.tink.daead.DeterministicAeadConfig
-import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import com.google.crypto.tink.subtle.Base64
 import io.github.ackeecz.guardian.core.MasterKey
+import io.github.ackeecz.guardian.core.internal.AndroidKeysetManagerSynchronizedBuilder
 import io.github.ackeecz.guardian.core.internal.Base64Value
 import io.github.ackeecz.guardian.core.internal.SynchronizedDataHolder
 import io.github.ackeecz.guardian.core.internal.WeakReferenceFactory
+import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.lang.ClassCastException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.security.GeneralSecurityException
+import java.security.KeyStore
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.atomic.AtomicBoolean
@@ -61,6 +63,9 @@ private const val VALUE_KEYSET_ALIAS = "__androidx_security_crypto_encrypted_pre
  * you really do need [SharedPreferences] interface and relied on it using Jetpack Security's
  * EncryptedSharedPreferences, you can convert Ackee [EncryptedSharedPreferences] to
  * [SharedPreferences] using [adaptToSharedPreferences] method.
+ *
+ * All Android [KeyStore] operations are synchronized using a provided [Semaphore].
+ * More info about this topic can be found in [AndroidKeyStoreSemaphore] documentation.
  *
  * **WARNING**: The preference file should not be backed up with Auto Backup. When restoring the
  * file it is likely the key used to encrypt it will no longer be present. You should exclude all
@@ -244,18 +249,26 @@ public interface EncryptedSharedPreferences {
          * generated data encryption key that is then used to encrypt/decrypt the preferences.
          * @param prefKeyEncryptionScheme The scheme to use for encrypting keys.
          * @param prefValueEncryptionScheme The scheme to use for encrypting values.
+         * @param keyStoreSemaphore [Semaphore] used to synchronize Android [KeyStore] operations.
+         * It is recommended to use a default [AndroidKeyStoreSemaphore], if you really don't need
+         * to provide a custom [Semaphore].
          *
          * @return The [EncryptedSharedPreferences] instance that encrypts all data.
          *
          * @throws GeneralSecurityException when a bad [MasterKey] or keyset has been attempted
          * @throws IOException when [fileName] can not be used
          */
+        // If we needed to add more parameters with default values in the future, consider deprecating
+        // this and migrating to a builder pattern, the same as for the EncryptedFile.
+        @JvmOverloads
+        @Suppress("LongParameterList")
         public fun create(
             fileName: String,
             getMasterKey: suspend () -> MasterKey,
             context: Context,
             prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
             prefValueEncryptionScheme: PrefValueEncryptionScheme,
+            keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore,
         ): EncryptedSharedPreferences {
             return create(
                 fileName = fileName,
@@ -263,6 +276,7 @@ public interface EncryptedSharedPreferences {
                 context = context,
                 prefKeyEncryptionScheme = prefKeyEncryptionScheme,
                 prefValueEncryptionScheme = prefValueEncryptionScheme,
+                keyStoreSemaphore = keyStoreSemaphore,
                 weakReferenceFactory = WeakReferenceFactory(),
                 defaultDispatcher = Dispatchers.Default,
             )
@@ -276,6 +290,7 @@ public interface EncryptedSharedPreferences {
             context: Context,
             prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
             prefValueEncryptionScheme: PrefValueEncryptionScheme,
+            keyStoreSemaphore: Semaphore,
             weakReferenceFactory: WeakReferenceFactory,
             defaultDispatcher: CoroutineDispatcher,
         ): EncryptedSharedPreferences {
@@ -285,6 +300,7 @@ public interface EncryptedSharedPreferences {
                 context = context,
                 prefKeyEncryptionScheme = prefKeyEncryptionScheme,
                 prefValueEncryptionScheme = prefValueEncryptionScheme,
+                keyStoreSemaphore = keyStoreSemaphore,
                 weakReferenceFactory = weakReferenceFactory,
                 defaultDispatcher = defaultDispatcher,
             )
@@ -500,6 +516,7 @@ private class EncryptedSharedPreferencesImpl(
     private val getMasterKey: suspend () -> MasterKey,
     private val prefKeyEncryptionScheme: EncryptedSharedPreferences.PrefKeyEncryptionScheme,
     private val prefValueEncryptionScheme: EncryptedSharedPreferences.PrefValueEncryptionScheme,
+    private val keyStoreSemaphore: Semaphore,
     private val weakReferenceFactory: WeakReferenceFactory,
     private val defaultDispatcher: CoroutineDispatcher,
 ) : EncryptedSharedPreferences {
@@ -737,20 +754,20 @@ private class EncryptedSharedPreferencesImpl(
         }
     }
 
-    private inner class CryptoObjectsHolder : SynchronizedDataHolder<CryptoObjects>(defaultDispatcher) {
+    private inner class CryptoObjectsHolder : SynchronizedDataHolder<CryptoObjects>() {
 
-        override suspend fun createSynchronizedData(): CryptoObjects {
+        override suspend fun createSynchronizedData(): CryptoObjects = withContext(defaultDispatcher) {
             DeterministicAeadConfig.register()
             AeadConfig.register()
 
             val masterKey = getMasterKey()
-            val daeadKeysetHandle = AndroidKeysetManager.Builder()
+            val daeadKeysetHandle = AndroidKeysetManagerSynchronizedBuilder(keyStoreSemaphore)
                 .withKeyTemplate(prefKeyEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, KEY_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
                 .build()
                 .keysetHandle
-            val aeadKeysetHandle = AndroidKeysetManager.Builder()
+            val aeadKeysetHandle = AndroidKeysetManagerSynchronizedBuilder(keyStoreSemaphore)
                 .withKeyTemplate(prefValueEncryptionScheme.keyTemplate)
                 .withSharedPref(applicationContext, VALUE_KEYSET_ALIAS, fileName)
                 .withMasterKeyUri(masterKey.keyStoreUri)
@@ -760,7 +777,7 @@ private class EncryptedSharedPreferencesImpl(
             val keyDeterministicAead = daeadKeysetHandle.getPrimitive(DeterministicAead::class.java)
             val valueAead = aeadKeysetHandle.getPrimitive(Aead::class.java)
 
-            return CryptoObjects(keyDeterministicAead, valueAead)
+            return@withContext CryptoObjects(keyDeterministicAead, valueAead)
         }
     }
 
