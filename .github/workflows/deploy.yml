@@ -17,14 +17,17 @@ jobs:
   # This job's steps must be synced with prePublishCheck Gradle task's checks to ensure that
   # we check required stuff on CI and at the same time developers can run the Gradle task to verify
   # their changes before publishing.
-  preflight_check:
+  preflight_checks:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/basic-preflight-check
+      - name: Setup
+        uses: ./.github/actions/setup
+        
+      - name: Basic preflight checks
+        uses: ./.github/actions/basic-preflight-check
 
       - name: Verify publishing
         run: ./gradlew verifyPublishing
@@ -45,7 +48,7 @@ jobs:
           ./gradlew :app:testDebugUnitTest
 
   publish:
-    needs: preflight_check
+    needs: preflight_checks
     runs-on: ubuntu-latest
     permissions:
       # Needed by softprops/action-gh-release to be able to create a release
@@ -54,7 +57,8 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Publish to Maven Central
         run: |

@@ -13,5 +13,8 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/basic-preflight-check
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Preflight checks
+        uses: ./.github/actions/basic-preflight-check
