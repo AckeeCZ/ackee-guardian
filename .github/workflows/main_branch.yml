@@ -9,6 +9,8 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout can't be included in the composite setup action, because the composite
+      # action needs to be first checked out by the checkout action.
       - name: Check out code
         uses: actions/checkout@v5
 
