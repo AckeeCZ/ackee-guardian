@@ -24,6 +24,9 @@ jobs:
       # action needs to be first checked out by the checkout action.
       - name: Check out code
         uses: actions/checkout@v5
+        with:
+          # Fetch all history including all tags, because we need previous release tag for verifyPublishing task
+          fetch-depth: 0
 
       - name: Setup
         uses: ./.github/actions/setup
