@@ -10,8 +10,13 @@ jobs:
   pull_request:
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout can't be included in the composite setup action, because the composite
+      # action needs to be first checked out by the checkout action.
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/basic-preflight-check
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Preflight checks
+        uses: ./.github/actions/basic-preflight-check
