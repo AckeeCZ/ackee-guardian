@@ -12,6 +12,7 @@ import androidx.test.core.app.ApplicationProvider
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.datastore.core.DataStoreCryptoParams
 import io.github.ackeecz.guardian.datastore.core.DataStoreEncryptionScheme
+import io.github.ackeecz.guardian.datastore.core.DataStoreKeysetConfig
 import io.github.ackeecz.guardian.datastore.preferences.createEncrypted
 import io.github.ackeecz.guardian.datastore.preferences.encryptedPreferencesDataStore
 import io.kotest.matchers.shouldBe
@@ -25,21 +26,22 @@ internal class DataStorePreferencesArtifactTest : AndroidTestWithKeyStore() {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     private val Context.encryptedPreferencesDataStore by encryptedPreferencesDataStore(
-        cryptoParams = DataStoreCryptoParams(
-            encryptionScheme = DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB,
-            getMasterKey = { MasterKey.getOrCreate() },
-        ),
+        cryptoParams = createCryptoParams(),
         name = "test_file",
     )
+
+    private fun createCryptoParams(): DataStoreCryptoParams {
+        return DataStoreCryptoParams(
+            keysetConfig = DataStoreKeysetConfig(DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB),
+            getMasterKey = { MasterKey.getOrCreate() },
+        )
+    }
 
     @Test
     fun `create encrypted preferences DataStore using factory`() = runTest {
         val underTest = PreferenceDataStoreFactory.createEncrypted(
             context = context,
-            cryptoParams = DataStoreCryptoParams(
-                encryptionScheme = DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB,
-                getMasterKey = { MasterKey.getOrCreate() },
-            ),
+            cryptoParams = createCryptoParams(),
             produceFile = { context.preferencesDataStoreFile("test_file") },
         )
         testDataStore(underTest)

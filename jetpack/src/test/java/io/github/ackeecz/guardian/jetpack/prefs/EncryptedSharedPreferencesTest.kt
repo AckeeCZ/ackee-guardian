@@ -5,13 +5,15 @@ import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.core.internal.AndroidTestWithKeyStore
-import io.github.ackeecz.guardian.core.internal.WeakReferenceFactoryFake
+import io.github.ackeecz.guardian.core.internal.TinkPrimitiveProvider
+import io.github.ackeecz.guardian.core.internal.WeakReferenceFactory
+import io.github.ackeecz.guardian.core.internal.clearFixture
 import io.github.ackeecz.guardian.core.internal.junit.rule.CoroutineRule
-import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences.PrefKeyEncryptionScheme
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences.PrefValueEncryptionScheme
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.junit.After
 import org.junit.Rule
 
 internal abstract class EncryptedSharedPreferencesTest : AndroidTestWithKeyStore() {
@@ -27,23 +29,31 @@ internal abstract class EncryptedSharedPreferencesTest : AndroidTestWithKeyStore
      */
     protected val onSharedPreferenceChangeListener = OnSharedPreferenceChangeListener()
 
+    @After
+    fun tearDown() {
+        TinkPrimitiveProvider.clearFixture()
+    }
+
+    @Suppress("LongParameterList")
     protected fun createSut(
         prefsFileName: String = "shared_prefs",
         getMasterKey: suspend () -> MasterKey = { MasterKey.getOrCreate() },
         prefKeyEncryptionScheme: PrefKeyEncryptionScheme = PrefKeyEncryptionScheme.AES256_SIV,
         prefValueEncryptionScheme: PrefValueEncryptionScheme = PrefValueEncryptionScheme.AES256_GCM,
-        weakReferenceFactory: WeakReferenceFactoryFake = WeakReferenceFactoryFake(),
+        weakReferenceFactory: WeakReferenceFactory = WeakReferenceFactory(),
+        cacheKeysets: Boolean = false,
     ): EncryptedSharedPreferences {
-        return EncryptedSharedPreferences.create(
-            context = context,
+        return EncryptedSharedPreferences.Builder(
             fileName = prefsFileName,
             getMasterKey = getMasterKey,
+            context = context,
             prefKeyEncryptionScheme = prefKeyEncryptionScheme,
             prefValueEncryptionScheme = prefValueEncryptionScheme,
-            keyStoreSemaphore = AndroidKeyStoreSemaphore,
-            weakReferenceFactory = weakReferenceFactory,
-            defaultDispatcher = coroutineRule.testDispatcher,
         )
+            .setCoroutineDispatcher(coroutineRule.testDispatcher)
+            .setWeakReferenceFactory(weakReferenceFactory)
+            .setCacheKeysets(cacheKeysets)
+            .build()
     }
 
     protected fun getSharedPreferences(prefsFileName: String): SharedPreferences {

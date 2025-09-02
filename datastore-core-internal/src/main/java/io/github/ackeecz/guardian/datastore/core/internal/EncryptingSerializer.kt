@@ -3,9 +3,8 @@ package io.github.ackeecz.guardian.datastore.core.internal
 import android.content.Context
 import androidx.datastore.core.Serializer
 import com.google.crypto.tink.StreamingAead
-import com.google.crypto.tink.streamingaead.StreamingAeadConfig
-import io.github.ackeecz.guardian.core.internal.AndroidKeysetManagerSynchronizedBuilder
 import io.github.ackeecz.guardian.core.internal.SynchronizedDataHolder
+import io.github.ackeecz.guardian.core.internal.TinkPrimitiveProvider
 import io.github.ackeecz.guardian.datastore.core.DataStoreCryptoParams
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -61,18 +60,19 @@ public class EncryptingSerializer<T>(
         private val context = context.applicationContext
 
         override suspend fun createSynchronizedData(): StreamingAead = withContext(scope.resolveDispatcher()) {
-            StreamingAeadConfig.register()
-            return@withContext AndroidKeysetManagerSynchronizedBuilder(keyStoreSemaphore)
-                .withKeyTemplate(cryptoParams.encryptionScheme.keyTemplate)
-                .withSharedPref(
-                    context,
-                    cryptoParams.keysetAlias,
-                    cryptoParams.keysetPrefsName,
-                )
-                .withMasterKeyUri(cryptoParams.getMasterKey().keyStoreUri)
-                .build()
-                .keysetHandle
-                .getPrimitive(StreamingAead::class.java)
+            val keysetConfig = cryptoParams.keysetConfig
+            val providerParams = TinkPrimitiveProvider.Params(
+                context = context,
+                masterKeyUri = cryptoParams.getMasterKey().keyStoreUri,
+                keyStoreSemaphore = keyStoreSemaphore,
+                keysetConfig = TinkPrimitiveProvider.KeysetConfig(
+                    keyTemplate = keysetConfig.encryptionScheme.keyTemplate,
+                    prefsName = keysetConfig.prefsName,
+                    alias = keysetConfig.alias,
+                    cacheKeyset = keysetConfig.cacheKeyset,
+                ),
+            )
+            TinkPrimitiveProvider.getStreamingAead(providerParams)
         }
 
         private fun CoroutineScope.resolveDispatcher(): CoroutineDispatcher {

@@ -11,6 +11,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.datastore.core.DataStoreCryptoParams
 import io.github.ackeecz.guardian.datastore.core.DataStoreEncryptionScheme
+import io.github.ackeecz.guardian.datastore.core.DataStoreKeysetConfig
 import io.github.ackeecz.guardian.datastore.createEncrypted
 import io.github.ackeecz.guardian.datastore.encryptedDataStore
 import io.kotest.matchers.shouldBe
@@ -26,22 +27,23 @@ internal class DataStoreArtifactTest : AndroidTestWithKeyStore() {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     private val Context.encryptedDataStore by encryptedDataStore(
-        cryptoParams = DataStoreCryptoParams(
-            encryptionScheme = DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB,
-            getMasterKey = { MasterKey.getOrCreate() },
-        ),
+        cryptoParams = createCryptoParams(),
         fileName = "test_file",
         serializer = TestDataSerializer,
     )
+
+    private fun createCryptoParams(): DataStoreCryptoParams {
+        return DataStoreCryptoParams(
+            keysetConfig = DataStoreKeysetConfig(DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB),
+            getMasterKey = { MasterKey.getOrCreate() },
+        )
+    }
 
     @Test
     fun `create encrypted DataStore using factory`() = runTest {
         val underTest = DataStoreFactory.createEncrypted(
             context = context,
-            cryptoParams = DataStoreCryptoParams(
-                encryptionScheme = DataStoreEncryptionScheme.AES256_GCM_HKDF_4KB,
-                getMasterKey = { MasterKey.getOrCreate() },
-            ),
+            cryptoParams = createCryptoParams(),
             serializer = TestDataSerializer,
             produceFile = { context.dataStoreFile("test_file") },
         )

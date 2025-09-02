@@ -18,7 +18,7 @@ public abstract class DataStoreDelegate<T> : ReadOnlyProperty<Context, DataStore
                 val applicationContext = thisRef.applicationContext
                 dataStoreSingleton = createDataStore(applicationContext)
             }
-            requireNotNull(dataStoreSingleton)
+            checkNotNull(dataStoreSingleton)
         }
     }
 

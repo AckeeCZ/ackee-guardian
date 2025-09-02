@@ -22,10 +22,9 @@ import android.content.Context
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.StreamingAead
 import com.google.crypto.tink.streamingaead.AesGcmHkdfStreamingKeyManager
-import com.google.crypto.tink.streamingaead.StreamingAeadConfig
 import io.github.ackeecz.guardian.core.MasterKey
-import io.github.ackeecz.guardian.core.internal.AndroidKeysetManagerSynchronizedBuilder
 import io.github.ackeecz.guardian.core.internal.SynchronizedDataHolder
+import io.github.ackeecz.guardian.core.internal.TinkPrimitiveProvider
 import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +67,7 @@ import java.security.KeyStore
  * val encryptedFile = EncryptedFile.Builder(
  *     file = file,
  *     context = context,
- *     encryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
+ *     keysetConfig = FileKeysetConfig(EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB),
  *     getMasterKey = getMasterKey,
  * ).build()
  * // Write to the encrypted file
@@ -130,18 +129,19 @@ public class EncryptedFile private constructor(private val fileBuilder: Builder)
     private inner class StreamingAeadHolder : SynchronizedDataHolder<StreamingAead>() {
 
         override suspend fun createSynchronizedData(): StreamingAead = withContext(fileBuilder.backgroundDispatcher) {
-            StreamingAeadConfig.register()
-            return@withContext AndroidKeysetManagerSynchronizedBuilder(fileBuilder.keyStoreSemaphore)
-                .withKeyTemplate(fileBuilder.encryptionScheme.keyTemplate)
-                .withSharedPref(
-                    fileBuilder.context,
-                    fileBuilder.keysetAlias,
-                    fileBuilder.keysetPrefsFileName,
-                )
-                .withMasterKeyUri(fileBuilder.getMasterKey().keyStoreUri)
-                .build()
-                .keysetHandle
-                .getPrimitive(StreamingAead::class.java)
+            val keysetConfig = fileBuilder.keysetConfig
+            val providerParams = TinkPrimitiveProvider.Params(
+                context = fileBuilder.context,
+                masterKeyUri = fileBuilder.getMasterKey().keyStoreUri,
+                keyStoreSemaphore = fileBuilder.keyStoreSemaphore,
+                keysetConfig = TinkPrimitiveProvider.KeysetConfig(
+                    keyTemplate = keysetConfig.encryptionScheme.keyTemplate,
+                    prefsName = keysetConfig.prefsName,
+                    alias = keysetConfig.alias,
+                    cacheKeyset = keysetConfig.cacheKeyset,
+                ),
+            )
+            TinkPrimitiveProvider.getStreamingAead(providerParams)
         }
     }
 
@@ -215,22 +215,33 @@ public class EncryptedFile private constructor(private val fileBuilder: Builder)
         override fun markSupported() = encryptedInputStream.markSupported()
     }
 
-    private companion object {
-
-        private const val KEYSET_PREFS_FILE_NAME = "__androidx_security_crypto_encrypted_file_pref__"
-        private const val KEYSET_ALIAS = "__androidx_security_crypto_encrypted_file_keyset__"
-    }
-
     public class Builder public constructor(
         internal val file: File,
         context: Context,
-        internal val encryptionScheme: FileEncryptionScheme,
+        internal var keysetConfig: FileKeysetConfig,
         internal val getMasterKey: suspend () -> MasterKey,
     ) {
 
+        @Deprecated(
+            message = "Use constructor with FileKeysetConfig instead",
+            replaceWith = ReplaceWith(
+                "EncryptedFile.Builder(file, context, FileKeysetConfig(encryptionScheme), getMasterKey)"
+            ),
+            level = DeprecationLevel.WARNING,
+        )
+        public constructor(
+            file: File,
+            context: Context,
+            encryptionScheme: FileEncryptionScheme,
+            getMasterKey: suspend () -> MasterKey,
+        ) : this(
+            file = file,
+            context = context,
+            keysetConfig = FileKeysetConfig(encryptionScheme = encryptionScheme),
+            getMasterKey = getMasterKey,
+        )
+
         internal val context = context.applicationContext
-        internal var keysetPrefsFileName = KEYSET_PREFS_FILE_NAME
-        internal var keysetAlias = KEYSET_ALIAS
         internal var backgroundDispatcher = Dispatchers.IO
         internal var keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore
 
@@ -238,9 +249,17 @@ public class EncryptedFile private constructor(private val fileBuilder: Builder)
          * @param keysetPrefName The SharedPreferences file to store the keyset.
          * @return This Builder
          */
+        @Deprecated(
+            message = "Use FileKeysetConfig instead",
+            level = DeprecationLevel.WARNING,
+        )
         public fun setKeysetPrefName(keysetPrefName: String): Builder {
-            this.keysetPrefsFileName = keysetPrefName
+            updateKeysetConfig { copy(prefsName = keysetPrefName) }
             return this
+        }
+
+        private fun updateKeysetConfig(update: FileKeysetConfig.() -> FileKeysetConfig) {
+            keysetConfig = keysetConfig.update()
         }
 
         /**
@@ -249,8 +268,12 @@ public class EncryptedFile private constructor(private val fileBuilder: Builder)
          *
          * @return This Builder
          */
+        @Deprecated(
+            message = "Use FileKeysetConfig instead",
+            level = DeprecationLevel.WARNING,
+        )
         public fun setKeysetAlias(keysetAlias: String): Builder {
-            this.keysetAlias = keysetAlias
+            updateKeysetConfig { copy(alias = keysetAlias) }
             return this
         }
 

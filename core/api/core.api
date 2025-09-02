@@ -1,3 +1,9 @@
+public abstract interface class io/github/ackeecz/guardian/core/KeysetConfig {
+	public abstract fun getAlias ()Ljava/lang/String;
+	public abstract fun getCacheKeyset ()Z
+	public abstract fun getPrefsName ()Ljava/lang/String;
+}
+
 public final class io/github/ackeecz/guardian/core/MasterKey {
 	public static final field Companion Lio/github/ackeecz/guardian/core/MasterKey$Companion;
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V

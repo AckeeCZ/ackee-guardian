@@ -1,8 +1,9 @@
 package io.github.ackeecz.guardian.core.internal
 
+import android.content.Context
 import com.google.crypto.tink.shaded.protobuf.ByteString
 import io.kotest.matchers.shouldBe
-import java.nio.Buffer
+import org.robolectric.shadow.api.Shadow
 import java.nio.ByteBuffer
 
 val String.utf8ByteSize: Int
@@ -20,4 +21,10 @@ infix fun ByteString.shouldHaveBitSize(bitSize: Int) {
         .size
         .let { it * 8 }
         .shouldBe(bitSize)
+}
+
+fun Context.getKeysetGetCallCount(prefsName: String, keysetAlias: String): Int {
+    val prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+    val shadowPrefs = Shadow.extract<ShadowSharedPreferences>(prefs)
+    return shadowPrefs.getGetCallCount(keysetAlias)
 }

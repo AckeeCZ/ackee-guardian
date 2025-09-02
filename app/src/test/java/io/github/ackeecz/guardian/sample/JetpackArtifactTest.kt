@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.jetpack.EncryptedFile
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences
+import io.github.ackeecz.guardian.jetpack.FileKeysetConfig
 import io.github.ackeecz.guardian.jetpack.adaptToSharedPreferences
 import io.github.ackeecz.guardian.sample.junit.rule.CoroutineRule
 import io.kotest.matchers.maps.shouldHaveSize
@@ -28,9 +29,9 @@ internal class JetpackArtifactTest : AndroidTestWithKeyStore() {
     @Test
     fun `encrypt file`() = runTest {
         val underTest = EncryptedFile.Builder(
-            context = context,
             file = context.createRandomFile(),
-            encryptionScheme = EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB,
+            context = context,
+            keysetConfig = FileKeysetConfig(EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB),
             getMasterKey = { MasterKey.getOrCreate() },
         ).build()
         val expected = "expected file content"
@@ -46,13 +47,13 @@ internal class JetpackArtifactTest : AndroidTestWithKeyStore() {
 
     @Test
     fun `encrypt shared preferences`() = runTest {
-        val underTest = EncryptedSharedPreferences.create(
-            context = context,
+        val underTest = EncryptedSharedPreferences.Builder(
             fileName = "test_prefs",
             getMasterKey = { MasterKey.getOrCreate() },
+            context = context,
             prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-        )
+        ).build()
         val stringKey = "key1"
         val expectedString = "expected string"
         val intKey = "key2"
@@ -75,13 +76,13 @@ internal class JetpackArtifactTest : AndroidTestWithKeyStore() {
     @Test
     @Suppress("DEPRECATION")
     fun `adapt encrypted shared preferences to shared preferences`() = runTest {
-        val underTest: SharedPreferences = EncryptedSharedPreferences.create(
-            context = context,
+        val underTest: SharedPreferences = EncryptedSharedPreferences.Builder(
             fileName = "test_prefs",
             getMasterKey = { MasterKey.getOrCreate() },
+            context = context,
             prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-        ).adaptToSharedPreferences()
+        ).build().adaptToSharedPreferences()
 
         val stringKey = "key1"
         val expectedString = "expected string"
