@@ -202,7 +202,7 @@ internal class EncryptedFileTest : AndroidTestWithKeyStore() {
                     createEncryptedFileBuilder(file = file)
                         .setKeysetAlias("alias_$keyAliasIndex")
                         // UnconfinedTestDispatcher internally allows to not confine execution to any
-                        // particular thread, which means that if we call DataStore.updateData from
+                        // particular thread, which means that if we call Encrypted.openFileOutput from
                         // Dispatchers.Default pool of threads, it actually uses threads from this pool
                         // and preserve this context, which is important for our case.
                         .setBackgroundDispatcher(UnconfinedTestDispatcher())
