@@ -9,14 +9,14 @@ import org.robolectric.util.ReflectionHelpers
 
 @Implements(className = "android.app.SharedPreferencesImpl")
 @Suppress("ProtectedMemberInFinalClass", "ProtectedInFinal")
-class ShadowSharedPreferences {
+public class ShadowSharedPreferences {
 
     @RealObject
     private lateinit var realPrefs: SharedPreferences
 
     private val getCallCount: MutableMap<String?, Int> = mutableMapOf()
 
-    fun getGetCallCount(key: String?): Int = getCallCount[key] ?: 0
+    public fun getGetCallCount(key: String?): Int = getCallCount[key] ?: 0
 
     @Implementation
     protected fun getString(key: String?, defValue: String?): String? {

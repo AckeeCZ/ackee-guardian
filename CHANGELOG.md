@@ -7,9 +7,20 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### core
+#### Changed
+- Update dependencies including Kotlin to 2.2.10 and Tink to 1.18.0
+
 ### datastore
+#### Changed
+- Update dependencies including Kotlin to 2.2.10 and Tink to 1.18.0
+
 ### datastore-preferences
+#### Changed
+- Update dependencies including Kotlin to 2.2.10 and Tink to 1.18.0
+
 ### jetpack
+#### Changed
+- Update dependencies including Kotlin to 2.2.10 and Tink to 1.18.0
 
 
 

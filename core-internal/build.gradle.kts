@@ -18,7 +18,7 @@ dependencies {
     testFixturesImplementation(libs.bouncyCastle.bcpkix)
     testFixturesImplementation(libs.coroutines.test)
     testFixturesImplementation(libs.junit4)
-    testFixturesImplementation(libs.kotest.framework.api)
+    testFixturesImplementation(libs.kotest.runner.junit5)
     testFixturesImplementation(libs.robolectric)
     testFixturesImplementation(libs.tink.android)
 }

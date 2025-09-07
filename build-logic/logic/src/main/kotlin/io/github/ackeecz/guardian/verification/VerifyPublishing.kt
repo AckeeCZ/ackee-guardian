@@ -2,6 +2,7 @@ package io.github.ackeecz.guardian.verification
 
 import io.github.ackeecz.guardian.util.PublishableProject
 import org.gradle.api.Project
+import org.gradle.process.ExecOperations
 import org.jetbrains.annotations.VisibleForTesting
 
 /**
@@ -28,11 +29,11 @@ internal class VerifyPublishing @VisibleForTesting constructor(
     private val checkArtifactUpdateStatus: CheckArtifactUpdateStatus,
 ) {
 
-    constructor() : this(
-        getPreviousTag = GetPreviousTag(),
-        getArtifactVersionFromTag = GetArtifactVersionFromTag(),
+    constructor(execOperations: ExecOperations) : this(
+        getPreviousTag = GetPreviousTag(execOperations),
+        getArtifactVersionFromTag = GetArtifactVersionFromTag(execOperations),
         getReleaseDependentProjects = GetReleaseDependentProjects(),
-        checkArtifactUpdateStatus = CheckArtifactUpdateStatus(),
+        checkArtifactUpdateStatus = CheckArtifactUpdateStatus(execOperations),
     )
 
     operator fun invoke(project: Project): Result {

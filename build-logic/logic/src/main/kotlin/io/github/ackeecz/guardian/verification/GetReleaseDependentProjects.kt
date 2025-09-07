@@ -33,8 +33,8 @@ private class GetReleaseDependentProjectsImpl : GetReleaseDependentProjects {
                     .asSequence()
                     .flatMap { it.dependencies }
                     .filterIsInstance<ProjectDependency>()
-                    .distinctBy { it.dependencyProject.path }
-                    .find { it.dependencyProject.path == project.path }
+                    .distinctBy { it.path }
+                    .find { it.path == project.path }
                 dependencyOnTargetProject != null
             }
     }

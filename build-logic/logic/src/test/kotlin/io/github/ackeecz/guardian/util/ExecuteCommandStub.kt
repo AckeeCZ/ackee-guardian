@@ -1,7 +1,5 @@
 package io.github.ackeecz.guardian.util
 
-import org.gradle.api.Project
-
 internal class ExecuteCommandStub : ExecuteCommand {
 
     private val _commands: MutableList<String> = mutableListOf()
@@ -9,7 +7,7 @@ internal class ExecuteCommandStub : ExecuteCommand {
 
     var resultStrategy: ResultStrategy = ResultStrategy.OneRepeating(ExecuteCommand.Result.Success(""))
 
-    override fun invoke(command: String, project: Project): ExecuteCommand.Result {
+    override fun invoke(command: String): ExecuteCommand.Result {
         _commands += command
         return when (val resultStrategy = resultStrategy) {
             is ResultStrategy.OneRepeating -> resultStrategy.result

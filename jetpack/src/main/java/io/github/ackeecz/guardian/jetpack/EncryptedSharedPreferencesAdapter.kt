@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting
 import io.github.ackeecz.guardian.core.internal.WeakReferenceFactory
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
-import kotlin.apply
 
 private typealias PrefsListener = SharedPreferences.OnSharedPreferenceChangeListener
 private typealias EncryptedPrefsListener = EncryptedSharedPreferences.OnSharedPreferenceChangeListener

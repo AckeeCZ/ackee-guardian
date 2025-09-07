@@ -7,13 +7,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
 /**
  * Task for BOM version verification. For more information see [VerifyBomVersion].
  */
 public abstract class VerifyBomVersionTask : DefaultTask() {
 
-    private val verifyBomVersion = VerifyBomVersion()
+    @get:Inject
+    protected abstract val execOperations: ExecOperations
+
+    private val verifyBomVersion by lazy { VerifyBomVersion(execOperations) }
 
     @TaskAction
     public fun verify() {

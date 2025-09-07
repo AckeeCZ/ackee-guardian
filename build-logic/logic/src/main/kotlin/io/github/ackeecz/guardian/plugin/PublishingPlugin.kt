@@ -1,7 +1,6 @@
 package io.github.ackeecz.guardian.plugin
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import com.vanniktech.maven.publish.SonatypeHost
 import io.github.ackeecz.guardian.properties.LibraryProperties
 import io.github.ackeecz.guardian.util.PublishableProject
 import io.github.ackeecz.guardian.verification.task.CheckIfUpdateNeededSinceCurrentTagTask
@@ -66,7 +65,7 @@ internal class PublishingPlugin : Plugin<Project> {
             }
 
             signAllPublications()
-            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+            publishToMavenCentral()
         }
 
         excludeTestFixturesFromPublishing()

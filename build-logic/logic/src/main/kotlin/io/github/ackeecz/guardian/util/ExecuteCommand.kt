@@ -1,11 +1,11 @@
 package io.github.ackeecz.guardian.util
 
-import org.gradle.api.Project
+import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 
 internal interface ExecuteCommand {
 
-    operator fun invoke(command: String, project: Project): Result
+    operator fun invoke(command: String): Result
 
     sealed interface Result {
 
@@ -21,16 +21,18 @@ internal interface ExecuteCommand {
 
     companion object {
 
-        operator fun invoke(): ExecuteCommand = ExecuteCommandImpl()
+        operator fun invoke(execOperations: ExecOperations): ExecuteCommand {
+            return ExecuteCommandImpl(execOperations)
+        }
     }
 }
 
-private class ExecuteCommandImpl : ExecuteCommand {
+private class ExecuteCommandImpl(private val execOperations: ExecOperations) : ExecuteCommand {
 
-    override fun invoke(command: String, project: Project): ExecuteCommand.Result {
+    override fun invoke(command: String): ExecuteCommand.Result {
         val standardOutputStream = ByteArrayOutputStream()
         val errorOutputStream = ByteArrayOutputStream()
-        val exitCode = project.exec {
+        val exitCode = execOperations.exec {
             commandLine = listOf("sh", "-c", command)
             isIgnoreExitValue = true
             standardOutput = standardOutputStream

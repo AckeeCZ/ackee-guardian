@@ -2,7 +2,7 @@ package io.github.ackeecz.guardian.core.internal
 
 import java.lang.ref.WeakReference
 
-class WeakReferenceFactoryFake : WeakReferenceFactory {
+public class WeakReferenceFactoryFake : WeakReferenceFactory {
 
     private val managedReferents = mutableListOf<WeakReference<*>>()
 
@@ -10,7 +10,7 @@ class WeakReferenceFactoryFake : WeakReferenceFactory {
         return WeakReference(referent).also { managedReferents.add(it) }
     }
 
-    fun <T> clear(referent: T) {
+    public fun <T> clear(referent: T) {
         managedReferents.filter { it.get() == referent }
             .forEach {
                 it.clear()
@@ -18,7 +18,7 @@ class WeakReferenceFactoryFake : WeakReferenceFactory {
             }
     }
 
-    fun clearAll() {
+    public fun clearAll() {
         managedReferents.forEach { it.clear() }
         managedReferents.clear()
     }

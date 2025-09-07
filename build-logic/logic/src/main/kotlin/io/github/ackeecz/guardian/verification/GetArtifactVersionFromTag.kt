@@ -5,6 +5,7 @@ import io.github.ackeecz.guardian.util.ExecuteCommand
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.internal.cc.base.logger
+import org.gradle.process.ExecOperations
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.Properties
 
@@ -19,8 +20,8 @@ internal interface GetArtifactVersionFromTag {
 
     companion object {
 
-        operator fun invoke(): GetArtifactVersionFromTag {
-            return GetArtifactVersionFromTagImpl(executeCommand = ExecuteCommand())
+        operator fun invoke(execOperations: ExecOperations): GetArtifactVersionFromTag {
+            return GetArtifactVersionFromTagImpl(executeCommand = ExecuteCommand(execOperations))
         }
     }
 }
@@ -45,7 +46,7 @@ internal class GetArtifactVersionFromTagImpl(
 
         private fun getVersionFromTag(tagResult: TagResult.Tag): ArtifactVersion? {
             val command = "git show ${tagResult.value}:$PROPERTIES_FILE_NAME"
-            when (val propertiesResult = executeCommand(command, project)) {
+            when (val propertiesResult = executeCommand(command)) {
                 is ExecuteCommand.Result.Success -> return parseVersionFromProperties(propertiesResult, tagResult)
                 is ExecuteCommand.Result.Error -> throw TagPropertiesException(project, tagResult)
             }

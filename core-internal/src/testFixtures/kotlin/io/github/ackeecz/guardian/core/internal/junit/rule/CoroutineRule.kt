@@ -6,8 +6,8 @@ import kotlinx.coroutines.test.TestDispatcher
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-class CoroutineRule(
-    val testDispatcher: TestDispatcher = StandardTestDispatcher(),
+public class CoroutineRule(
+    public val testDispatcher: TestDispatcher = StandardTestDispatcher(),
 ) : TestWatcher() {
 
     private val coroutineExtension = CoroutineExtension(testDispatcher)
