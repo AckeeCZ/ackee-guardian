@@ -61,7 +61,7 @@ internal class GetArtifactVersionFromTagImpl(
             return try {
                 val version = LibraryProperties(properties, project).getArtifactProperties().version
                 ArtifactVersion(version)
-            } catch (e: IllegalArgumentException) {
+            } catch (e: IllegalStateException) {
                 if (project.version.toString() == INITIAL_LIBRARY_VERSION) {
                     return null
                 } else {

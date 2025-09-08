@@ -58,3 +58,5 @@ fun getKeysetHandle(
     val masterAead = AndroidKeystoreKmsClient().getAead(masterKeyUri)
     return KeysetHandle.read(keysetReader, masterAead)
 }
+
+fun TinkPrimitiveProvider.clearFixture() = clear()

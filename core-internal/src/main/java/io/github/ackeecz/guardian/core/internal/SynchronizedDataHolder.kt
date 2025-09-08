@@ -24,7 +24,7 @@ public abstract class SynchronizedDataHolder<T : Any> {
             if (synchronizedData == null) {
                 synchronizedData = createSynchronizedData()
             }
-            requireNotNull(synchronizedData)
+            checkNotNull(synchronizedData)
         }
     }
 

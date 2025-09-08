@@ -44,4 +44,4 @@ public class LibraryProperties internal constructor(
     private fun getProperty(name: String) = properties.getNonNull(name)
 }
 
-internal fun Properties.getNonNull(name: String) = requireNotNull(getProperty(name))
+internal fun Properties.getNonNull(name: String) = checkNotNull(getProperty(name))

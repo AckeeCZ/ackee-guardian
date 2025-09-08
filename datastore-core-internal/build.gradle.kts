@@ -26,5 +26,6 @@ dependencies {
     testFixturesImplementation(libs.coroutines.test)
     testFixturesImplementation(libs.junit4)
     testFixturesImplementation(libs.kotest.assertions.core)
+    testFixturesImplementation(libs.robolectric)
     testFixturesImplementation(libs.tink.android)
 }

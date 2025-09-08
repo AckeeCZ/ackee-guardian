@@ -25,15 +25,14 @@ import androidx.collection.arraySetOf
 import com.google.crypto.tink.Aead
 import com.google.crypto.tink.DeterministicAead
 import com.google.crypto.tink.KeyTemplate
-import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.daead.AesSivKeyManager
-import com.google.crypto.tink.daead.DeterministicAeadConfig
 import com.google.crypto.tink.subtle.Base64
+import io.github.ackeecz.guardian.core.KeysetConfig
 import io.github.ackeecz.guardian.core.MasterKey
-import io.github.ackeecz.guardian.core.internal.AndroidKeysetManagerSynchronizedBuilder
 import io.github.ackeecz.guardian.core.internal.Base64Value
 import io.github.ackeecz.guardian.core.internal.SynchronizedDataHolder
+import io.github.ackeecz.guardian.core.internal.TinkPrimitiveProvider
 import io.github.ackeecz.guardian.core.internal.WeakReferenceFactory
 import io.github.ackeecz.guardian.core.keystore.android.AndroidKeyStoreSemaphore
 import kotlinx.coroutines.CoroutineDispatcher
@@ -74,13 +73,13 @@ private const val VALUE_KEYSET_ALIAS = "__androidx_security_crypto_encrypted_pre
  *
  * Basic use of the class:
  *```
- * val encryptedSharedPreferences = EncryptedSharedPreferences.create(
+ * val encryptedSharedPreferences = EncryptedSharedPreferences.Builder(
  *     fileName = "secret_shared_prefs",
  *     getMasterKey = { MasterKey.getOrCreate() },
  *     context = context,
  *     prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
  *     prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
- * )
+ * ).build()
  * // Use EncryptedSharedPreferences and Editor as you would normally use SharedPreferences
  * encryptedSharedPreferences.edit {
  *     putString("secret_key", "secret_value")
@@ -240,6 +239,8 @@ public interface EncryptedSharedPreferences {
 
     public companion object {
 
+        internal val DEFAULT_KEY_STORE_SEMAPHORE: Semaphore = AndroidKeyStoreSemaphore
+
         /**
          * Creates an instance of [EncryptedSharedPreferences]
          *
@@ -258,52 +259,94 @@ public interface EncryptedSharedPreferences {
          * @throws GeneralSecurityException when a bad [MasterKey] or keyset has been attempted
          * @throws IOException when [fileName] can not be used
          */
-        // If we needed to add more parameters with default values in the future, consider deprecating
-        // this and migrating to a builder pattern, the same as for the EncryptedFile.
         @JvmOverloads
         @Suppress("LongParameterList")
+        @Deprecated(
+            message = "Use Builder instead.",
+            replaceWith = ReplaceWith(
+                "EncryptedSharedPreferences.Builder(fileName,getMasterKey,context,prefKeyEncryptionScheme,prefValueEncryptionScheme).build()"
+            ),
+            level = DeprecationLevel.WARNING,
+        )
         public fun create(
             fileName: String,
             getMasterKey: suspend () -> MasterKey,
             context: Context,
             prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
             prefValueEncryptionScheme: PrefValueEncryptionScheme,
-            keyStoreSemaphore: Semaphore = AndroidKeyStoreSemaphore,
+            keyStoreSemaphore: Semaphore = DEFAULT_KEY_STORE_SEMAPHORE,
         ): EncryptedSharedPreferences {
-            return create(
+            return Builder(
                 fileName = fileName,
                 getMasterKey = getMasterKey,
                 context = context,
                 prefKeyEncryptionScheme = prefKeyEncryptionScheme,
                 prefValueEncryptionScheme = prefValueEncryptionScheme,
-                keyStoreSemaphore = keyStoreSemaphore,
-                weakReferenceFactory = WeakReferenceFactory(),
-                defaultDispatcher = Dispatchers.Default,
-            )
+            ).setKeyStoreSemaphore(keyStoreSemaphore).build()
+        }
+    }
+
+    /**
+     * Builder of [EncryptedSharedPreferences].
+     *
+     * @param fileName The name of the file to open. Can not contain path separators.
+     * @param getMasterKey Returns the master key to use. Master key is used to encrypt/decrypt
+     * generated data encryption key that is then used to encrypt/decrypt the preferences.
+     * @param context Context of the application.
+     * @param prefKeyEncryptionScheme The scheme to use for encrypting keys.
+     * @param prefValueEncryptionScheme The scheme to use for encrypting values.
+     */
+    public class Builder public constructor(
+        internal val fileName: String,
+        internal val getMasterKey: suspend () -> MasterKey,
+        context: Context,
+        internal val prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
+        internal val prefValueEncryptionScheme: PrefValueEncryptionScheme,
+    ) {
+
+        internal val context = context.applicationContext
+
+        internal var keyStoreSemaphore: Semaphore = DEFAULT_KEY_STORE_SEMAPHORE
+        internal var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+        internal var cacheKeysets: Boolean = false
+        internal var weakReferenceFactory: WeakReferenceFactory = WeakReferenceFactory()
+
+        /**
+         * Sets [semaphore] used to synchronize Android [KeyStore] operations. It is recommended to
+         * use a default [AndroidKeyStoreSemaphore], if you really don't need to provide a custom
+         * [Semaphore].
+         */
+        public fun setKeyStoreSemaphore(semaphore: Semaphore): Builder = apply {
+            keyStoreSemaphore = semaphore
         }
 
-        @Suppress("LongParameterList")
+        /**
+         * Sets [dispatcher] to be used for heavy operations that should be run on "background"
+         * dispatcher.
+         */
+        public fun setCoroutineDispatcher(dispatcher: CoroutineDispatcher): Builder = apply {
+            coroutineDispatcher = dispatcher
+        }
+
+        /**
+         * Whether to cache the loaded keysets in memory across multiple instances of this same
+         * preferences. Default is `false`. For more information about general keyset caching
+         * mechanism and its security implications, see [KeysetConfig].
+         */
+        public fun setCacheKeysets(cacheKeysets: Boolean): Builder = apply {
+            this.cacheKeysets = cacheKeysets
+        }
+
         @VisibleForTesting
-        internal fun create(
-            fileName: String,
-            getMasterKey: suspend () -> MasterKey,
-            context: Context,
-            prefKeyEncryptionScheme: PrefKeyEncryptionScheme,
-            prefValueEncryptionScheme: PrefValueEncryptionScheme,
-            keyStoreSemaphore: Semaphore,
-            weakReferenceFactory: WeakReferenceFactory,
-            defaultDispatcher: CoroutineDispatcher,
-        ): EncryptedSharedPreferences {
-            return EncryptedSharedPreferencesImpl(
-                fileName = fileName,
-                getMasterKey = getMasterKey,
-                context = context,
-                prefKeyEncryptionScheme = prefKeyEncryptionScheme,
-                prefValueEncryptionScheme = prefValueEncryptionScheme,
-                keyStoreSemaphore = keyStoreSemaphore,
-                weakReferenceFactory = weakReferenceFactory,
-                defaultDispatcher = defaultDispatcher,
-            )
+        internal fun setWeakReferenceFactory(factory: WeakReferenceFactory): Builder = apply {
+            weakReferenceFactory = factory
+        }
+
+        /**
+         * Builds an instance of [EncryptedSharedPreferences] with the provided configuration.
+         */
+        public fun build(): EncryptedSharedPreferences {
+            return EncryptedSharedPreferencesImpl(this)
         }
     }
 
@@ -509,25 +552,24 @@ public interface EncryptedSharedPreferences {
     }
 }
 
-@Suppress("LongParameterList")
-private class EncryptedSharedPreferencesImpl(
-    context: Context,
-    private val fileName: String,
-    private val getMasterKey: suspend () -> MasterKey,
-    private val prefKeyEncryptionScheme: EncryptedSharedPreferences.PrefKeyEncryptionScheme,
-    private val prefValueEncryptionScheme: EncryptedSharedPreferences.PrefValueEncryptionScheme,
-    private val keyStoreSemaphore: Semaphore,
-    private val weakReferenceFactory: WeakReferenceFactory,
-    private val defaultDispatcher: CoroutineDispatcher,
-) : EncryptedSharedPreferences {
+private class EncryptedSharedPreferencesImpl(builder: EncryptedSharedPreferences.Builder) : EncryptedSharedPreferences {
 
-    private val applicationContext = context.applicationContext
+    private val fileName = builder.fileName
+    private val getMasterKey = builder.getMasterKey
+    private val context = builder.context
+    private val prefKeyEncryptionScheme = builder.prefKeyEncryptionScheme
+    private val prefValueEncryptionScheme = builder.prefValueEncryptionScheme
+    private val keyStoreSemaphore = builder.keyStoreSemaphore
+    private val coroutineDispatcher = builder.coroutineDispatcher
+    private val cacheKeysets = builder.cacheKeysets
+    private val weakReferenceFactory = builder.weakReferenceFactory
+
     private val sharedPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
     private val cryptoObjectsHolder = CryptoObjectsHolder()
     private val listeners = CopyOnWriteArrayList<WeakReference<EncryptedSharedPreferences.OnSharedPreferenceChangeListener>>()
 
     // Switching context to minimize switching back and forth in the "child" suspend functions
-    override suspend fun getAll(): Map<String?, *> = withContext(defaultDispatcher) {
+    override suspend fun getAll(): Map<String?, *> = withContext(coroutineDispatcher) {
         getAllEncryptedKeys().associate { encryptedKey ->
             decryptKey(encryptedKey)?.value to getDecryptedValue(encryptedKey)
         }
@@ -545,7 +587,7 @@ private class EncryptedSharedPreferencesImpl(
     }
 
     suspend fun decryptKey(encryptedKey: PreferenceKey.Encrypted): PreferenceKey.Decrypted? {
-        return withContext(defaultDispatcher) {
+        return withContext(coroutineDispatcher) {
             try {
                 val keyDeterministicAead = cryptoObjectsHolder.getOrCreate().keyDeterministicAead
                 val decryptedKeyBytes = keyDeterministicAead.decryptDeterministically(
@@ -586,7 +628,7 @@ private class EncryptedSharedPreferencesImpl(
         }
     }
 
-    suspend fun encryptKey(key: PreferenceKey.Decrypted?): PreferenceKey.Encrypted = withContext(defaultDispatcher) {
+    suspend fun encryptKey(key: PreferenceKey.Decrypted?): PreferenceKey.Encrypted = withContext(coroutineDispatcher) {
         throwIfReservedKey(key)
         val resolvedKey = key?.value ?: NULL_VALUE
         try {
@@ -605,7 +647,7 @@ private class EncryptedSharedPreferencesImpl(
     private suspend fun decryptValue(
         encryptedKey: PreferenceKey.Encrypted,
         encryptedValue: Base64Value,
-    ): ByteArray = withContext(defaultDispatcher) {
+    ): ByteArray = withContext(coroutineDispatcher) {
         val cipherText = Base64.decode(encryptedValue.value, Base64.DEFAULT)
         val valueAead = cryptoObjectsHolder.getOrCreate().valueAead
         valueAead.decrypt(cipherText, getValueEncryptionAssociatedData(encryptedKey))
@@ -694,13 +736,13 @@ private class EncryptedSharedPreferencesImpl(
     }
 
     override fun edit(): EncryptedSharedPreferences.Editor {
-        return Editor(this, sharedPreferences.edit(), defaultDispatcher)
+        return Editor(this, sharedPreferences.edit(), coroutineDispatcher)
     }
 
     override suspend fun edit(
         commit: Boolean,
         action: suspend EncryptedSharedPreferences.Editor.() -> Unit,
-    ): Unit = withContext(defaultDispatcher) { // Switching context to minimize switching back and forth in the "child" suspend functions
+    ): Unit = withContext(coroutineDispatcher) { // Switching context to minimize switching back and forth in the "child" suspend functions
         with(edit()) {
             action()
             if (commit) {
@@ -722,7 +764,7 @@ private class EncryptedSharedPreferencesImpl(
     suspend fun encryptKeyValuePair(
         key: PreferenceKey.Decrypted?,
         value: ByteArray?,
-    ): Pair<PreferenceKey.Encrypted, Base64Value> = withContext(defaultDispatcher) {
+    ): Pair<PreferenceKey.Encrypted, Base64Value> = withContext(coroutineDispatcher) {
         val encryptedKey = encryptKey(key)
         val associatedData = getValueEncryptionAssociatedData(encryptedKey)
         val valueAead = cryptoObjectsHolder.getOrCreate().valueAead
@@ -756,28 +798,44 @@ private class EncryptedSharedPreferencesImpl(
 
     private inner class CryptoObjectsHolder : SynchronizedDataHolder<CryptoObjects>() {
 
-        override suspend fun createSynchronizedData(): CryptoObjects = withContext(defaultDispatcher) {
-            DeterministicAeadConfig.register()
-            AeadConfig.register()
-
+        override suspend fun createSynchronizedData(): CryptoObjects = withContext(coroutineDispatcher) {
             val masterKey = getMasterKey()
-            val daeadKeysetHandle = AndroidKeysetManagerSynchronizedBuilder(keyStoreSemaphore)
-                .withKeyTemplate(prefKeyEncryptionScheme.keyTemplate)
-                .withSharedPref(applicationContext, KEY_KEYSET_ALIAS, fileName)
-                .withMasterKeyUri(masterKey.keyStoreUri)
-                .build()
-                .keysetHandle
-            val aeadKeysetHandle = AndroidKeysetManagerSynchronizedBuilder(keyStoreSemaphore)
-                .withKeyTemplate(prefValueEncryptionScheme.keyTemplate)
-                .withSharedPref(applicationContext, VALUE_KEYSET_ALIAS, fileName)
-                .withMasterKeyUri(masterKey.keyStoreUri)
-                .build()
-                .keysetHandle
 
-            val keyDeterministicAead = daeadKeysetHandle.getPrimitive(DeterministicAead::class.java)
-            val valueAead = aeadKeysetHandle.getPrimitive(Aead::class.java)
+            val keyDeterministicAeadParams = createPrimitiveProviderParams(
+                masterKey = masterKey,
+                keysetConfig = TinkPrimitiveProvider.KeysetConfig(
+                    keyTemplate = prefKeyEncryptionScheme.keyTemplate,
+                    prefsName = fileName,
+                    alias = KEY_KEYSET_ALIAS,
+                    cacheKeyset = cacheKeysets,
+                ),
+            )
+            val keyDeterministicAead = TinkPrimitiveProvider.getDeterministicAead(keyDeterministicAeadParams)
+
+            val valueAeadParams = createPrimitiveProviderParams(
+                masterKey = masterKey,
+                keysetConfig = TinkPrimitiveProvider.KeysetConfig(
+                    keyTemplate = prefValueEncryptionScheme.keyTemplate,
+                    prefsName = fileName,
+                    alias = VALUE_KEYSET_ALIAS,
+                    cacheKeyset = cacheKeysets,
+                ),
+            )
+            val valueAead = TinkPrimitiveProvider.getAead(valueAeadParams)
 
             return@withContext CryptoObjects(keyDeterministicAead, valueAead)
+        }
+
+        private fun createPrimitiveProviderParams(
+            masterKey: MasterKey,
+            keysetConfig: TinkPrimitiveProvider.KeysetConfig
+        ): TinkPrimitiveProvider.Params {
+            return TinkPrimitiveProvider.Params(
+                context = context,
+                masterKeyUri = masterKey.keyStoreUri,
+                keyStoreSemaphore = keyStoreSemaphore,
+                keysetConfig = keysetConfig,
+            )
         }
     }
 

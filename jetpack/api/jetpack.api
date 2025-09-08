@@ -6,6 +6,7 @@ public final class io/github/ackeecz/guardian/jetpack/EncryptedFile {
 
 public final class io/github/ackeecz/guardian/jetpack/EncryptedFile$Builder {
 	public fun <init> (Ljava/io/File;Landroid/content/Context;Lio/github/ackeecz/guardian/jetpack/EncryptedFile$FileEncryptionScheme;Lkotlin/jvm/functions/Function1;)V
+	public fun <init> (Ljava/io/File;Landroid/content/Context;Lio/github/ackeecz/guardian/jetpack/FileKeysetConfig;Lkotlin/jvm/functions/Function1;)V
 	public final fun build ()Lio/github/ackeecz/guardian/jetpack/EncryptedFile;
 	public final fun setBackgroundDispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/ackeecz/guardian/jetpack/EncryptedFile$Builder;
 	public final fun setKeyStoreSemaphore (Lkotlinx/coroutines/sync/Semaphore;)Lio/github/ackeecz/guardian/jetpack/EncryptedFile$Builder;
@@ -36,6 +37,14 @@ public abstract interface class io/github/ackeecz/guardian/jetpack/EncryptedShar
 	public abstract fun getStringSet (Ljava/lang/String;Ljava/util/Set;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun registerOnSharedPreferenceChangeListener (Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$OnSharedPreferenceChangeListener;)V
 	public abstract fun unregisterOnSharedPreferenceChangeListener (Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$OnSharedPreferenceChangeListener;)V
+}
+
+public final class io/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Builder {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Landroid/content/Context;Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$PrefValueEncryptionScheme;)V
+	public final fun build ()Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences;
+	public final fun setCacheKeysets (Z)Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Builder;
+	public final fun setCoroutineDispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Builder;
+	public final fun setKeyStoreSemaphore (Lkotlinx/coroutines/sync/Semaphore;)Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Builder;
 }
 
 public final class io/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Companion {
@@ -83,5 +92,14 @@ public final class io/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences
 
 public final class io/github/ackeecz/guardian/jetpack/EncryptedSharedPreferencesAdapterKt {
 	public static final fun adaptToSharedPreferences (Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences;)Landroid/content/SharedPreferences;
+}
+
+public final class io/github/ackeecz/guardian/jetpack/FileKeysetConfig : io/github/ackeecz/guardian/core/KeysetConfig {
+	public fun <init> (Lio/github/ackeecz/guardian/jetpack/EncryptedFile$FileEncryptionScheme;Ljava/lang/String;Ljava/lang/String;Z)V
+	public synthetic fun <init> (Lio/github/ackeecz/guardian/jetpack/EncryptedFile$FileEncryptionScheme;Ljava/lang/String;Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getAlias ()Ljava/lang/String;
+	public fun getCacheKeyset ()Z
+	public final fun getEncryptionScheme ()Lio/github/ackeecz/guardian/jetpack/EncryptedFile$FileEncryptionScheme;
+	public fun getPrefsName ()Ljava/lang/String;
 }
 

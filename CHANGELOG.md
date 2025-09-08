@@ -8,8 +8,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### core
 ### datastore
+#### Added
+- Possibility to cache keysets in memory to improve performance of cryptographic operations
+
 ### datastore-preferences
+#### Added
+- Possibility to cache keysets in memory to improve performance of cryptographic operations
+
 ### jetpack
+#### Added
+- Possibility to cache keysets in memory to improve performance of cryptographic operations
 
 
 

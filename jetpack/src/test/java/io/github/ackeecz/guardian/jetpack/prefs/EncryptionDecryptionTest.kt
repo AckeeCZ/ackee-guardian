@@ -371,7 +371,7 @@ internal class EncryptionDecryptionTest : EncryptedSharedPreferencesTest() {
                 prefsFileName = prefsFileName,
             )
             decryptedPreferenceKey == preferenceKey
-        }.let(::requireNotNull)
+        }.let(::checkNotNull)
     }
 
     private fun getAndDecryptPreferenceValue(
