@@ -8,6 +8,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### core
 ### datastore
+### datastore-preferences
+### jetpack
+
+
+
+## BOM [1.2.0] - 2025-09-08
+### datastore
 #### Added
 - Possibility to cache keysets in memory to improve performance of cryptographic operations
 
