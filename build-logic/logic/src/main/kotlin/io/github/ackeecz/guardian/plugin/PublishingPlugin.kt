@@ -54,7 +54,7 @@ internal class PublishingPlugin : Plugin<Project> {
                     developer {
                         id.set(libraryProperties.pomDeveloperId)
                         name.set(libraryProperties.pomDeveloperName)
-                        url.set(libraryProperties.pomDeveloperEmail)
+                        email.set(libraryProperties.pomDeveloperEmail)
                     }
                 }
                 scm {
