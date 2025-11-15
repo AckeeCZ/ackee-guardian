@@ -38,7 +38,7 @@ internal class TestingPlugin : Plugin<Project> {
             testImplementation(libs.coroutines.test)
 
             // JUnit
-            testImplementation(platform(libs.junit5.bom))
+            testImplementation(platform(libs.junit.bom))
             testRuntimeOnly(libs.junit.vintage.engine)
 
             // Kotest
