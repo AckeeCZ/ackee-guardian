@@ -5,6 +5,7 @@ import io.github.ackeecz.guardian.verification.GetTag.Companion.BOM_VERSION_TAG_
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.internal.cc.base.logger
+import org.gradle.process.ExecOperations
 import org.jetbrains.annotations.VisibleForTesting
 
 /**
@@ -44,8 +45,8 @@ internal interface GetCurrentTag : GetTag {
 
     companion object {
 
-        operator fun invoke(): GetCurrentTag {
-            return GetCurrentTagImpl(ExecuteCommand())
+        operator fun invoke(execOperations: ExecOperations): GetCurrentTag {
+            return GetCurrentTagImpl(ExecuteCommand(execOperations))
         }
     }
 }
@@ -60,8 +61,8 @@ internal interface GetPreviousTag : GetTag {
 
     companion object {
 
-        operator fun invoke(): GetPreviousTag {
-            return GetPreviousTagImpl(ExecuteCommand())
+        operator fun invoke(execOperations: ExecOperations): GetPreviousTag {
+            return GetPreviousTagImpl(ExecuteCommand(execOperations))
         }
     }
 }
@@ -88,7 +89,7 @@ internal class GetPreviousTagImpl(
 
     override fun invoke(project: Project): TagResult {
         val getPreviousTagCommand = "git describe --tags --match \"$BOM_VERSION_TAG_PREFIX*\" " +
-            "--abbrev=0 \$(git rev-list --tags=\"$BOM_VERSION_TAG_PREFIX*\" --skip=1 --max-count=1 HEAD)"
+            "--abbrev=0 $(git rev-list --tags=\"$BOM_VERSION_TAG_PREFIX*\" --skip=1 --max-count=1 HEAD)"
         return GetTagImpl(
             project = project,
             executeCommand = executeCommand,
@@ -104,7 +105,7 @@ private class GetTagImpl(
 ) {
 
     fun invoke(): TagResult {
-        return when (val tagResult = executeCommand(getTagCommand, project)) {
+        return when (val tagResult = executeCommand(getTagCommand)) {
             is ExecuteCommand.Result.Success -> TagResult.Tag(tagResult.commandOutput)
             is ExecuteCommand.Result.Error -> processTagError(tagResult)
         }
@@ -121,7 +122,7 @@ private class GetTagImpl(
     private fun processNoTagFoundError(): TagResult.FirstCommitHash {
         logger.warn("No $BOM_VERSION_TAG_PREFIX* tag found. If this is unexpected, please fix the name of the release tag.")
         val getFirstCommitHashCommand = "git rev-list --max-parents=0 HEAD"
-        when (val firstCommitHashResult = executeCommand(getFirstCommitHashCommand, project)) {
+        when (val firstCommitHashResult = executeCommand(getFirstCommitHashCommand)) {
             is ExecuteCommand.Result.Success -> {
                 val firstCommitHash = firstCommitHashResult.commandOutput
                 return TagResult.FirstCommitHash(firstCommitHash)

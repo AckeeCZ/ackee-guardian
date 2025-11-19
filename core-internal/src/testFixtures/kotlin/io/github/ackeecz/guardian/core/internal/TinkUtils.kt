@@ -3,6 +3,7 @@ package io.github.ackeecz.guardian.core.internal
 import android.content.Context
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.LegacyKeysetSerialization
 import com.google.crypto.tink.integration.android.AndroidKeystoreKmsClient
 import com.google.crypto.tink.integration.android.SharedPrefKeysetReader
 import com.google.crypto.tink.proto.AesGcmHkdfStreamingKey
@@ -11,7 +12,7 @@ import com.google.crypto.tink.shaded.protobuf.ByteString
 import com.google.crypto.tink.streamingaead.AesGcmHkdfStreamingKeyManager
 import io.kotest.matchers.shouldBe
 
-fun KeysetHandle.assertAesGcmHkdfEncryptionScheme(
+public fun KeysetHandle.assertAesGcmHkdfEncryptionScheme(
     expectedKeyBitSize: Int,
     expectedCiphertextSegmentBitSize: Int,
 ) {
@@ -27,18 +28,19 @@ private infix fun AesGcmHkdfStreamingKey.shouldUseCiphertextSegmentBitSize(bitSi
     params.ciphertextSegmentSize shouldBe bitSize
 }
 
-infix fun KeysetHandle.shouldHaveTypeUrlFromTemplate(template: KeyTemplate) {
+@Suppress("DEPRECATION")
+public infix fun KeysetHandle.shouldHaveTypeUrlFromTemplate(template: KeyTemplate) {
     keysetInfo
         .getKeyInfo(0)
         .typeUrl
         .shouldBe(template.typeUrl)
 }
 
-fun KeysetHandle.getFirstKeyDataValue(): ByteString {
+public fun KeysetHandle.getFirstKeyDataValue(): ByteString {
     return getKeyset().getKey(0).keyData.value
 }
 
-fun KeysetHandle.getKeyset(): Keyset {
+public fun KeysetHandle.getKeyset(): Keyset {
     return KeysetHandle::class.java
         .declaredMethods
         .find { it.name == "getKeyset" }!!
@@ -48,7 +50,7 @@ fun KeysetHandle.getKeyset(): Keyset {
         }
 }
 
-fun getKeysetHandle(
+public fun getKeysetHandle(
     context: Context,
     masterKeyUri: String,
     keysetPrefsName: String,
@@ -56,7 +58,9 @@ fun getKeysetHandle(
 ): KeysetHandle {
     val keysetReader = SharedPrefKeysetReader(context, keysetAlias, keysetPrefsName)
     val masterAead = AndroidKeystoreKmsClient().getAead(masterKeyUri)
-    return KeysetHandle.read(keysetReader, masterAead)
+    return LegacyKeysetSerialization.parseEncryptedKeyset(keysetReader, masterAead, byteArrayOf())
 }
 
-fun TinkPrimitiveProvider.clearFixture() = clear()
+public fun TinkPrimitiveProvider.clearFixture() {
+    clear()
+}

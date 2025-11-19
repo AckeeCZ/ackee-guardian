@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.test.core.app.ApplicationProvider
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.StreamingAead
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.core.internal.AndroidTestWithKeyStore
 import io.github.ackeecz.guardian.core.internal.InvalidKeysetConfigException
-import io.github.ackeecz.guardian.core.internal.ShadowSharedPreferences
 import io.github.ackeecz.guardian.core.internal.TinkPrimitiveProvider
 import io.github.ackeecz.guardian.core.internal.assertAesGcmHkdfEncryptionScheme
 import io.github.ackeecz.guardian.core.internal.clearFixture
@@ -37,7 +37,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
-import org.robolectric.shadow.api.Shadow
 import java.io.File
 import java.io.InputStream
 import kotlin.random.Random
@@ -45,15 +44,15 @@ import kotlin.random.Random
 private const val DEFAULT_KEYSET_PREFS_NAME = "__io_github_ackeecz_guardian_pref__"
 private const val DEFAULT_KEYSET_ALIAS = "__io_github_ackeecz_guardian_datastore_keyset__"
 
-abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyStore() {
+public abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyStore() {
 
     @get:Rule
-    val coroutineRule: CoroutineRule = CoroutineRule()
+    public val coroutineRule: CoroutineRule = CoroutineRule()
 
     protected val context: Context = ApplicationProvider.getApplicationContext()
 
     @After
-    fun tearDown() {
+    public fun tearDown() {
         deleteDefaultDataStoreFolder()
         TinkPrimitiveProvider.clearFixture()
     }
@@ -159,8 +158,10 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     protected abstract suspend fun InputStream.decodeTestData(): DataStoreData
 
     @Test
-    fun `generate data encryption key in keyset stored in shared preferences with default prefs name and keyset alias using old API`() = runTest {
-        testDefaultKey { createDefaultCryptoParamsOldApi() }
+    public fun `generate data encryption key in keyset stored in shared preferences with default prefs name and keyset alias using old API`() {
+        runTest {
+            testDefaultKey { createDefaultCryptoParamsOldApi() }
+        }
     }
 
     private suspend fun testDefaultKey(createParams: () -> DataStoreCryptoParams) {
@@ -184,17 +185,21 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `generate data encryption key in keyset stored in shared preferences with default prefs name and keyset alias using new API`() = runTest {
-        testDefaultKey { createDefaultCryptoParams() }
+    public fun `generate data encryption key in keyset stored in shared preferences with default prefs name and keyset alias using new API`() {
+        runTest {
+            testDefaultKey { createDefaultCryptoParams() }
+        }
     }
 
     @Test
-    fun `generate data encryption key in keyset stored in shared preferences with custom prefs name and keyset alias using old API`() = runTest {
-        testCustomKey { prefsName, alias ->
-            createCryptoParamsOldApi(
-                keysetPrefsName = prefsName,
-                keysetAlias = alias,
-            )
+    public fun `generate data encryption key in keyset stored in shared preferences with custom prefs name and keyset alias using old API`() {
+        runTest {
+            testCustomKey { prefsName, alias ->
+                createCryptoParamsOldApi(
+                    keysetPrefsName = prefsName,
+                    keysetAlias = alias,
+                )
+            }
         }
     }
 
@@ -210,12 +215,14 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `generate data encryption key in keyset stored in shared preferences with custom prefs name and keyset alias using new API`() = runTest {
-        testCustomKey { prefsName, alias ->
-            createCryptoParams(
-                keysetPrefsName = prefsName,
-                keysetAlias = alias,
-            )
+    public fun `generate data encryption key in keyset stored in shared preferences with custom prefs name and keyset alias using new API`() {
+        runTest {
+            testCustomKey { prefsName, alias ->
+                createCryptoParams(
+                    keysetPrefsName = prefsName,
+                    keysetAlias = alias,
+                )
+            }
         }
     }
 
@@ -226,7 +233,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
      * - correct used associated data
      */
     @Test
-    fun `encrypt DataStore with data encryption key`() = runTest {
+    public fun `encrypt DataStore with data encryption key`(): Unit = runTest {
         val expectedData = createExpectedData()
         val masterKey = MasterKey.getOrCreate()
         val cryptoParams = createDefaultCryptoParams(getMasterKey = { masterKey })
@@ -239,7 +246,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
         val dataStoreFile = getDefaultDataStoreFile(fileName)
         val associatedData = dataStoreFile.name.toByteArray(Charsets.UTF_8)
         getDefaultKeysetHandle(masterKey)
-            .getPrimitive(StreamingAead::class.java)
+            .getPrimitive(RegistryConfiguration.get(), StreamingAead::class.java)
             .newDecryptingStream(dataStoreFile.inputStream(), associatedData)
             .decodeTestData()
             .shouldBe(expectedData)
@@ -255,7 +262,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `decrypt DataStore with data encryption key`() = runTest {
+    public fun `decrypt DataStore with data encryption key`(): Unit = runTest {
         val expectedData = createExpectedData()
         val cryptoParams = createDefaultCryptoParams()
         val firstDataStoreScope = createDataStoreCoroutineScope()
@@ -277,7 +284,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `apply correct DataStore encryption scheme using old API`() = runTest {
+    public fun `apply correct DataStore encryption scheme using old API`(): Unit = runTest {
         testEncryptionScheme { scheme, prefsName, keysetAlias, masterKey ->
             createCryptoParamsOldApi(
                 encryptionScheme = scheme,
@@ -321,7 +328,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `apply correct DataStore encryption scheme using new API`() = runTest {
+    public fun `apply correct DataStore encryption scheme using new API`(): Unit = runTest {
         testEncryptionScheme { scheme, prefsName, keysetAlias, masterKey ->
             createCryptoParams(
                 encryptionScheme = scheme,
@@ -333,7 +340,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `generate same data encryption key for multiple encrypted DataStores concurrently`() = runTest {
+    public fun `generate same data encryption key for multiple encrypted DataStores concurrently`(): Unit = runTest {
         val expectedData = createExpectedData()
         repeat(times = 50) { keyAliasIndex ->
             fun createDataStoresWithScopes(): Map<DataStore<DataStoreData>, CoroutineScope> {
@@ -398,7 +405,7 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `do not cache data encryption key by default using old API`() = runTest {
+    public fun `do not cache data encryption key by default using old API`(): Unit = runTest {
         testDefaultCaching(createDefaultCryptoParamsOldApi())
     }
 
@@ -422,12 +429,12 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `do not cache data encryption key by default using new API`() = runTest {
+    public fun `do not cache data encryption key by default using new API`(): Unit = runTest {
         testDefaultCaching(createDefaultCryptoParams())
     }
 
     @Test
-    fun `do not cache data encryption key if disabled`() = runTest {
+    public fun `do not cache data encryption key if disabled`(): Unit = runTest {
         testKeyCaching(cacheKeyset = false)
     }
 
@@ -445,12 +452,12 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `cache data encryption key if enabled`() = runTest {
+    public fun `cache data encryption key if enabled`(): Unit = runTest {
         testKeyCaching(cacheKeyset = true)
     }
 
     @Test
-    fun `fail if caching not enabled in first config but enabled in second for the same key`() = runTest {
+    public fun `fail if caching not enabled in first config but enabled in second for the same key`(): Unit = runTest {
         testInvalidCacheConfig(firstCacheKeyset = false, secondCacheKeyset = true)
     }
 
@@ -465,12 +472,12 @@ abstract class EncryptedDataStoreTest<DataStoreData : Any> : AndroidTestWithKeyS
     }
 
     @Test
-    fun `fail if caching enabled in first config but not enabled in second for the same key`() = runTest {
+    public fun `fail if caching enabled in first config but not enabled in second for the same key`(): Unit = runTest {
         testInvalidCacheConfig(firstCacheKeyset = true, secondCacheKeyset = false)
     }
 
     @Test
-    fun `allow different caching values for different keys`() = runTest {
+    public fun `allow different caching values for different keys`(): Unit = runTest {
         suspend fun getKey(fileName: String, keysetAlias: String, cacheKeyset: Boolean) {
             val params = createCryptoParams(keysetAlias = keysetAlias, cacheKeyset = cacheKeyset)
             createSut(fileName = fileName, cryptoParams = params).forceEncryptionKeyGeneration()

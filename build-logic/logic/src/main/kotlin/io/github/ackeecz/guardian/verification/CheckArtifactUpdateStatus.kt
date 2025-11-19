@@ -3,6 +3,7 @@ package io.github.ackeecz.guardian.verification
 import io.github.ackeecz.guardian.util.ExecuteCommand
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.process.ExecOperations
 import org.jetbrains.annotations.VisibleForTesting
 
 /**
@@ -15,8 +16,8 @@ internal interface CheckArtifactUpdateStatus {
 
     companion object {
 
-        operator fun invoke(): CheckArtifactUpdateStatus {
-            return CheckArtifactUpdateStatusImpl(executeCommand = ExecuteCommand())
+        operator fun invoke(execOperations: ExecOperations): CheckArtifactUpdateStatus {
+            return CheckArtifactUpdateStatusImpl(executeCommand = ExecuteCommand(execOperations))
         }
     }
 }
@@ -32,7 +33,7 @@ internal class CheckArtifactUpdateStatusImpl(
     ): ArtifactUpdateStatus {
         val dirPathToCheck = project.file(SRC_MAIN_DIR).absolutePath
         val command = "git diff ${tagResult.value} -- $dirPathToCheck"
-        return when (val diffResult = executeCommand(command, project)) {
+        return when (val diffResult = executeCommand(command)) {
             is ExecuteCommand.Result.Success -> {
                 if (diffResult.commandOutput.isBlank()) {
                     ArtifactUpdateStatus.UP_TO_DATE

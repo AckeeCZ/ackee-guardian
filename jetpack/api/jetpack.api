@@ -28,6 +28,7 @@ public abstract interface class io/github/ackeecz/guardian/jetpack/EncryptedShar
 	public abstract fun contains (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun edit ()Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences$Editor;
 	public abstract fun edit (ZLkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun edit$default (Lio/github/ackeecz/guardian/jetpack/EncryptedSharedPreferences;ZLkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public abstract fun getAll (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getBoolean (Ljava/lang/String;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getFloat (Ljava/lang/String;FLkotlin/coroutines/Continuation;)Ljava/lang/Object;

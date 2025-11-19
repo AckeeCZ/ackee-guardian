@@ -1,6 +1,7 @@
 package io.github.ackeecz.guardian.verification
 
 import org.gradle.api.Project
+import org.gradle.process.ExecOperations
 import org.jetbrains.annotations.VisibleForTesting
 
 /**
@@ -12,9 +13,9 @@ internal class VerifyBomVersion @VisibleForTesting constructor(
     private val getArtifactVersionFromTag: GetArtifactVersionFromTag,
 ) {
 
-    constructor() : this(
-        getCurrentTag = GetCurrentTag(),
-        getArtifactVersionFromTag = GetArtifactVersionFromTag(),
+    constructor(execOperations: ExecOperations) : this(
+        getCurrentTag = GetCurrentTag(execOperations),
+        getArtifactVersionFromTag = GetArtifactVersionFromTag(execOperations),
     )
 
     operator fun invoke(project: Project): Result {

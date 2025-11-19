@@ -38,14 +38,12 @@ internal class TestingPlugin : Plugin<Project> {
             testImplementation(libs.coroutines.test)
 
             // JUnit
-            testImplementation(platform(libs.junit5.bom))
+            testImplementation(platform(libs.junit.bom))
             testRuntimeOnly(libs.junit.vintage.engine)
 
             // Kotest
             testImplementation(libs.kotest.assertions.core)
-            testImplementation(libs.kotest.framework.api)
-            testImplementation(libs.kotest.framework.datatest)
-            testRuntimeOnly(libs.kotest.runner.junit5)
+            testImplementation(libs.kotest.runner.junit5)
         }
     }
 }

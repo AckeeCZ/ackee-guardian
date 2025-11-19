@@ -22,8 +22,8 @@ import org.robolectric.annotation.Config
  */
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.R], shadows = [ShadowSharedPreferences::class])
-abstract class AndroidTestWithKeyStore {
+public abstract class AndroidTestWithKeyStore {
 
     @get:Rule
-    val fakeKeyStoreRule: AndroidFakeKeyStoreRule = AndroidFakeKeyStoreRule()
+    public val fakeKeyStoreRule: AndroidFakeKeyStoreRule = AndroidFakeKeyStoreRule()
 }

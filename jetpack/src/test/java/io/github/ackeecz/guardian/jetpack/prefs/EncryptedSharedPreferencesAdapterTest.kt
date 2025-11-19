@@ -10,13 +10,13 @@ import io.github.ackeecz.guardian.core.internal.WeakReferenceFactoryFake
 import io.github.ackeecz.guardian.core.internal.junit.rule.CoroutineRule
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferences
 import io.github.ackeecz.guardian.jetpack.EncryptedSharedPreferencesAdapter
-import io.kotest.common.runBlocking
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule

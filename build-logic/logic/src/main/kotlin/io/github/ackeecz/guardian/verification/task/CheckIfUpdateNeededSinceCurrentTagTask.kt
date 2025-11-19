@@ -9,6 +9,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
 /**
  * Checks if the artifact has changed and needs to be updated (new version published) since the
@@ -26,8 +28,11 @@ import org.gradle.api.tasks.TaskAction
  */
 internal abstract class CheckIfUpdateNeededSinceCurrentTagTask : DefaultTask() {
 
-    private val getCurrentTag = GetCurrentTag()
-    private val checkArtifactUpdateStatus = CheckArtifactUpdateStatus()
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
+    private val getCurrentTag by lazy { GetCurrentTag(execOperations) }
+    private val checkArtifactUpdateStatus by lazy { CheckArtifactUpdateStatus(execOperations) }
 
     @TaskAction
     fun executeCheck() {

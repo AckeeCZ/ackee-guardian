@@ -7,13 +7,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
 /**
  * Task for publishing verification. For more information see [VerifyPublishing].
  */
 internal abstract class VerifyPublishingTask : DefaultTask() {
 
-    private val verifyPublishing = VerifyPublishing()
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
+    private val verifyPublishing by lazy { VerifyPublishing(execOperations) }
 
     @TaskAction
     fun verify() {

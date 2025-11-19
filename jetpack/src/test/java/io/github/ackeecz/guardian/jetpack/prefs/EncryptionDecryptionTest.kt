@@ -5,6 +5,7 @@ import com.google.crypto.tink.Aead
 import com.google.crypto.tink.DeterministicAead
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.daead.AesSivKeyManager
 import com.google.crypto.tink.proto.AesGcmKey
@@ -106,7 +107,7 @@ internal class EncryptionDecryptionTest : EncryptedSharedPreferencesTest() {
         return getPrefsKeyKeysetHandle(
             masterKey = masterKey,
             prefsFileName = prefsFileName,
-        ).getPrimitive(DeterministicAead::class.java)
+        ).getPrimitive(RegistryConfiguration.get(), DeterministicAead::class.java)
     }
 
     private fun getPrefsKeyKeysetHandle(masterKey: MasterKey, prefsFileName: String): KeysetHandle {
@@ -392,7 +393,7 @@ internal class EncryptionDecryptionTest : EncryptedSharedPreferencesTest() {
         return getPrefsValueKeysetHandle(
             masterKey = masterKey,
             prefsFileName = prefsFileName,
-        ).getPrimitive(Aead::class.java)
+        ).getPrimitive(RegistryConfiguration.get(), Aead::class.java)
     }
 
     private fun getPrefsValueKeysetHandle(masterKey: MasterKey, prefsFileName: String): KeysetHandle {

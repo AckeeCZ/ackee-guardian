@@ -6,6 +6,7 @@ import com.google.crypto.tink.Aead
 import com.google.crypto.tink.DeterministicAead
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.StreamingAead
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.daead.DeterministicAeadConfig
@@ -28,7 +29,7 @@ public object TinkPrimitiveProvider {
     public suspend fun getStreamingAead(params: Params): StreamingAead {
         StreamingAeadConfig.register()
         val keysetHandle = getOrCreateKeysetHandle(params)
-        return keysetHandle.getPrimitive(StreamingAead::class.java)
+        return keysetHandle.getPrimitive(RegistryConfiguration.get(), StreamingAead::class.java)
     }
 
     private suspend fun getOrCreateKeysetHandle(params: Params): KeysetHandle {
@@ -81,13 +82,13 @@ public object TinkPrimitiveProvider {
     public suspend fun getDeterministicAead(params: Params): DeterministicAead {
         DeterministicAeadConfig.register()
         val keysetHandle = getOrCreateKeysetHandle(params)
-        return keysetHandle.getPrimitive(DeterministicAead::class.java)
+        return keysetHandle.getPrimitive(RegistryConfiguration.get(), DeterministicAead::class.java)
     }
 
     public suspend fun getAead(params: Params): Aead {
         AeadConfig.register()
         val keysetHandle = getOrCreateKeysetHandle(params)
-        return keysetHandle.getPrimitive(Aead::class.java)
+        return keysetHandle.getPrimitive(RegistryConfiguration.get(), Aead::class.java)
     }
 
     @VisibleForTesting

@@ -11,7 +11,22 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### datastore-preferences
 ### jetpack
 
+## BOM [1.2.1] - 2025-11-15
+### core
+#### Changed
+- Update dependencies including Kotlin to 2.2.21 and Tink to 1.19.0
 
+### datastore
+#### Changed
+- Update dependencies including Kotlin to 2.2.21 and Tink to 1.19.0
+
+### datastore-preferences
+#### Changed
+- Update dependencies including Kotlin to 2.2.21 and Tink to 1.19.0
+
+### jetpack
+#### Changed
+- Update dependencies including Kotlin to 2.2.21 and Tink to 1.19.0
 
 ## BOM [1.2.0] - 2025-09-08
 ### datastore

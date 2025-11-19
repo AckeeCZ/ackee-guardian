@@ -8,8 +8,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
-internal class RegisterPreflightChecksPlugin : Plugin<Project> {
+internal abstract class RegisterPreflightChecksPlugin : Plugin<Project> {
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
 
     override fun apply(target: Project) {
         RegisterPreMergeRequestCheck(target).invoke()
@@ -121,12 +126,9 @@ internal class RegisterPreflightChecksPlugin : Plugin<Project> {
         }
 
         private fun Project.executeGradleTask(taskName: String) {
-            val executeCommand = ExecuteCommand()
+            val executeCommand = ExecuteCommand(execOperations)
             val rootProjectPath = project.rootProject.projectDir.absolutePath
-            val result = executeCommand(
-                command = "$rootProjectPath/gradlew $taskName",
-                project = project,
-            )
+            val result = executeCommand(command = "$rootProjectPath/gradlew $taskName")
             when (result) {
                 is ExecuteCommand.Result.Success -> println(result.commandOutput)
                 is ExecuteCommand.Result.Error -> throw GradleException(result.commandOutput)

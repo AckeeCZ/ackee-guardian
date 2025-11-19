@@ -29,7 +29,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.KeyGeneratorSpi
 import javax.crypto.SecretKey
 
-class AndroidFakeKeyStoreRule : ExternalResource() {
+public class AndroidFakeKeyStoreRule : ExternalResource() {
 
     override fun before() {
         AndroidKeyStoreProvider.setUp()
@@ -42,7 +42,7 @@ class AndroidFakeKeyStoreRule : ExternalResource() {
     /**
      * Returns all key generations for the [alias] during this test execution
      */
-    fun getKeyHistory(alias: String): List<KeyStore.Entry> {
+    public fun getKeyHistory(alias: String): List<KeyStore.Entry> {
         return AndroidKeyStoreProvider.getKeyHistory(alias)
     }
 }

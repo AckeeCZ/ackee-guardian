@@ -3,6 +3,7 @@ package io.github.ackeecz.guardian.jetpack
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.StreamingAead
 import io.github.ackeecz.guardian.core.MasterKey
 import io.github.ackeecz.guardian.core.internal.AndroidTestWithKeyStore
@@ -159,7 +160,7 @@ internal class EncryptedFileTest : AndroidTestWithKeyStore() {
         underTest.openFileOutput().write(expectedPlainText)
 
         val actualPlainText = getDefaultKeysetHandle(masterKey)
-            .getPrimitive(StreamingAead::class.java)
+            .getPrimitive(RegistryConfiguration.get(), StreamingAead::class.java)
             .newDecryptingStream(file.inputStream(), file.name.toByteArray(Charsets.UTF_8))
             .readText()
         actualPlainText shouldBe expectedPlainText
